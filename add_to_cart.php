@@ -23,6 +23,6 @@ if (mysqli_num_rows($check_result) > 0) {
     mysqli_query($conn, $insert_query);
 }
 
-header("Location: cart.php");
+header("Location: keranjang.php");
 exit();
 ?>
