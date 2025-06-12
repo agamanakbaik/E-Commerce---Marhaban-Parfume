@@ -1,74 +1,279 @@
 <?php
 session_start();
 
-// Cek apakah admin sudah login
+//Cek apakah admin sudah login
 if (!isset($_SESSION['admin'])) {
     header("Location: login.php");
     exit;
 }
-
-// Cegah browser menyimpan cache halaman admin
+//Cegah browser menyimpan cache halaman admin
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard - Marhaban Parfume</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <title>Hello, world!</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary-color:rgb(31, 92, 184);
+            --secondary-color: #6366f1;
+            --accent-color: #818cf8;
+            --dark-color: #111827;
+            --light-color: #f9fafb;
+            --gold-accent: #f59e0b;
+            --gradient-1: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-color);
+            line-height: 1.6;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            background: white;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #4a5568(--primary-color);
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15pxr rgb(31, 92, 184);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgb(31, 92, 184);
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background: var(--gradient-1);
+            color: white;
+            border-bottom: none;
+            padding: 20px 24px;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .modal-title {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 16px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 300px;
+        }
+
+        .search-box i {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .search-box input {
+            padding-left: 40px;
+            border-radius: 50px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .banner {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--dark-color);
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-color), var(--gold-accent));
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 4px;
+        }
+
+        .price-tag {
+            background: var(--gradient-1);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .tentangkami {
+            font-weight: 500;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .tentangkami:hover {
+            color: rgb(31, 92, 184);
+            ;
+        }
+
+        .produkami {
+            font-weight: 500;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .produkami:hover {
+            color: rgb(31, 92, 184);
+            ;
+        }
+    </style>
 </head>
 
-<script>
-    var isLoggedIn = <?= json_encode($loggedIn) ?>; // Kirim status login ke JavaScript
-</script>
-<script src="main.js"></script> <!-- Hubungkan file JS -->
+<body>
 
-<body class="bg-secondary">
-    <div class="container p-0 mb-4 mt-4 rounded-3 shadow bg-white">
-        <!-- Menu -->
-        <nav class="d-md-flex p-4">
-            <div>
-                <h1>Marhaban Parfume</h1>
-            </div>
 
-            <div class="ms-auto my-auto">
-                <ul class="list-inline m-0">
-                    <li class="list-inline-item mx-md-3">
-                        <a href="#" class="text-decoration-none text-dark fw-bold dropdown-toggle" id="dropdownMenuLink"
-                            data-bs-toggle="dropdown" aria-expanded="false">
+    <script>
+        var isLoggedIn = <?= json_encode($loggedIn) ?>; // Kirim status login ke JavaScript
+    </script>
+    <!-- <script src="main.js"></script> Hubungkan file JS -->
+
+    <!-- Main Container/pembungkus utama -->
+    <div class="container-fluid px-0">
+
+        <!-- navbar -->
+        <nav class="bg-white shadow-md py-4 px-6 lg:px-12">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="#" class="navbar-brand flex items-center">
+                        <img src="./images/logo.png" alt="Foto Anda" class="h-12 w-12 mr-2">
+                        <span>Marhaban Parfume</span> </a>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+
+                    <!-- Wrapper/pembungkus -->
+                    <div class="relative inline-block">
+
+                        <!-- Tombol -->
+                        <button onclick="toggleDropdown()" class="flex items-center gap-1 produkami">
                             Produk Kami
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                            <li><a class="dropdown-item" href="halamanadmin.php">Semua Kategori</a></li>
-                            <li><a class="dropdown-item" href="halamanadmin.php?category_id=1">Bibit Parfume</a></li>
-                            <li><a class="dropdown-item" href="halamanadmin.php?category_id=2">Botol Parfume</a></li>
-                            <li><a class="dropdown-item" href="halamanadmin.php?category_id=3">Paket Usaha</a></li>
-                        </ul>
-                    </li>
-                    <li class="list-inline-item mx-md-3"><a href="#tentangkami"
-                            class="text-decoration-none text-dark fw-bold">Tentang Kami</a></li>
-                    <li class="list-inline-item mx-md-3"><a href="#caraorder"
-                            class="text-decoration-none text-dark fw-bold">Cara Order</a></li>
+                            <i id="chevron"
+                                class="fas fa-chevron-down text-xs mt-0.5 transition-transform duration-300"></i>
+                        </button>
 
-                    <!-- Keranjang -->
-                    <li class="list-inline-item mx-md-3">
-                        <a href="cart.php" class="text-decoration-none text-dark fw-bold">
-                            <i class="fa fa-shopping-cart"></i>
-                        </a>
-                    </li>
+                        <!-- Dropdown Menu -->
+                        <div id="dropdownMenu"
+                            class="absolute left-0 hidden bg-white shadow-lg rounded-md mt-2 py-2 w-48 z-10">
+                            <a href="halamanadmin.php"
+                                class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Semua
+                                Kategori</a>
+                            <a href="halamanadmin.php?category_id=1"
+                                class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Bibit Parfume</a>
+                            <a href="halamanadmin.php?category_id=2"
+                                class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Botol Parfume</a>
+                            <a href="halamanadmin.php?category_id=3"
+                                class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Paket Usaha</a>
+                        </div>
+                    </div>
 
-                    <!-- Example single danger button -->
+                    <!-- Script  dropdown menu-->
+                    <script>
+                        function toggleDropdown() {
+                            const menu = document.getElementById('dropdownMenu');
+                            const icon = document.getElementById('chevron');
+                            menu.classList.toggle('hidden');
+                            icon.classList.toggle('rotate-180');
+                        }
+
+                        // Optional: klik luar nutup menu
+                        document.addEventListener('click', function (e) {
+                            const btn = e.target.closest('button');
+                            const menu = document.getElementById('dropdownMenu');
+                            if (!e.target.closest('.relative')) {
+                                menu.classList.add('hidden');
+                                document.getElementById('chevron').classList.remove('rotate-180');
+                            }
+                        });
+                    </script>
+
+                    <a href="#tentangkami" class="tentangkami">Tentang Kami</a>
+                    <!-- <a href="#caraorder" class="nav-link">Cara Order</a> -->
+
+                    <!-- dropdown menu logout -->
                     <div class="btn-group">
                         <button type="button" class="btn btn-danger" data-bs-toggle="dropdown" aria-expanded="false"
                             style="background-color: #fff; border: #fff; color: #212529; margin-bottom: 7px;">
@@ -87,60 +292,199 @@ header("Expires: 0");
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
                     </div>
-                </ul>
-            </div>
+                </div>
         </nav>
 
-        <!-- Banner -->
-        <div class="px-4 mb-4">
-            <img src="images/banner.jpg" class="w-100 rounded-3">
-        </div>
+        <!-- Main Content/konten utama -->
+        <div class="container my-4">
 
-        <!-- Katalog -->
-        <h3 class="text-center">Our Collection</h3>
-        <div class="text-center w-50 mx-auto fw-light">
-            Toko Grosir Marhaban Perfume menjual berbagai aroma bibit parfum, botol parfum, perlengkapan racik parfum,
-            dll.
-            Wajib bertanya-tanya terlebih dahulu sebelum melakukan pengambilan barang agar kami cek ketersediaan bahan
-            yang diinginkan.
-            <br>Jam Operasional: Senin - Sabtu 08:30-17:00
+            <!-- Banner -->
+            <div class="relative">
+                <div class="w-full h-96 overflow-hidden">
+                    <img src="images/banner_marhaban.png" alt="Marhaban Parfume" class="w-full h-full object-cover">
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-900 to-transparent opacity-75"></div>
+                <div class="absolute inset-0 flex items-center px-6 lg:px-12">
+                    <div class="max-w-2xl">
+                        <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4">Koleksi Parfume Berkualitas</h1>
+                        <p class="text-lg text-white mb-6">Temukan aroma yang sempurna untuk setiap kesempatan</p>
+                        <a href="#cari-list"
+                            class="bg-white text-blue-700 px-6 py-3 rounded-full font-medium hover:bg-purple-50 transition duration-300">
+                            Kelola Produk
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <!--penjelasan produk -->
+            <div class="text-center mb-5">
+                <h3 class="section-title">Our Collection</h3>
+                <p class="text-muted w-75 mx-auto">
+                    Toko Grosir Marhaban Perfume menjual berbagai aroma bibit parfum, botol parfum, perlengkapan racik
+                    parfum, dll.
+                    Wajib bertanya-tanya terlebih dahulu sebelum melakukan pengambilan barang agar kami cek ketersediaan
+                    bahan
+                    yang diinginkan.
+                    <br>Jam Operasional: Senin - Sabtu 08:30-17:00
+                </p>
+            </div>
 
+            <!-- pencarian dan tambah produk -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" id="cari-list" placeholder="Cari produk...">
+                </div>
 
-            <!-- Tombol Tambah Produk -->
-            <div class="text-center my-4">
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                    Tambah Produk
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    <i class="fas fa-plus me-2"></i>Tambah Produk
                 </button>
             </div>
 
-            <div style="padding-right: 50px;" class="mb-3 mt-3">
-                <input type="text" class="form-control" style=" margin-left: auto; position:relative; top:40px;"
-                    id="cari-list" placeholder="Cari List Disini...">
+            <!-- produk Grid -->
+            <div id="kumpulan_katalog" class="row g-4">
+                <?php
+                include 'db.php';
+
+                if (!$conn) {
+                    die("Koneksi database gagal: " . mysqli_connect_error());
+                }
+
+                if (isset($_GET['category_id'])) {
+                    $category_id = intval($_GET['category_id']);
+                    $result = mysqli_query($conn, "SELECT * FROM products WHERE category_id = $category_id");
+                } else {
+                    $result = mysqli_query($conn, "SELECT * FROM products");
+                }
+
+                if (!$result) {
+                    die("Query error: " . mysqli_error($conn));
+                }
+
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $name = htmlspecialchars($row["name"]);
+                    $description = htmlspecialchars($row["description"]);
+                    $price = number_format($row["price"], 0, ',', '.');
+                    $image = !empty($row["image"]) ? "images/" . $row["image"] : "images/no-image.jpg";
+
+                    echo "
+                    <div class='col-md-3 col-sm-6 col-12 product-item' data-name='$name' data-description='$description'>
+                        <div class='card h-100'>
+                            <!-- Gambar responsif dan tidak terpotong -->
+                            <img src='$image' class=' rounded-xl img-fluid object-fit-contain' style='object-fit: cover;' alt='$name'>
+                            <div class='card-body'>
+                                <h5 class='card-title'>$name</h5>
+                                <div class='d-none deskripsi'>
+                                    <p class='card-text text-muted'>$description</p>
+                                </div>
+                            </div>
+                            <div class='card-footer bg-transparent border-top-0'>
+                                <div class='d-flex justify-content-between align-items-center'>
+                                    <span class='price-tag'>Rp $price</span>
+                                    <div class='btn-group'>
+                                        <button class='btn btn-sm btn-outline-primary btnDetail'>
+                                            <i class='fas fa-eye'></i>
+                                        </button>
+                                        <button class='btn btn-sm btn-outline-success btnEdit'
+                                            data-bs-toggle='modal' data-bs-target='#editProductModal'
+                                            data-id='{$row['id']}'
+                                            data-name='" . htmlspecialchars($row['name']) . "'
+                                            data-description='" . htmlspecialchars($row['description']) . "'
+                                            data-price='{$row['price']}'
+                                            data-image='{$row['image']}'>
+                                            <i class='fas fa-edit'></i>
+                                        </button>
+                                        <button class='btn btn-sm btn-outline-danger btnDelete' data-id='{$row['id']}'>
+                                            <i class='fas fa-trash'></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>";
+
+                }
+                ?>
+            </div>
+            <br>
+            <!-- About us / tentang  kami -->
+            <div id="tentangkami" class="bg-white p-5 rounded-3 shadow-sm mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center mb-4 mb-md-0">
+                        <img src="images/about-us.png" class="img-fluid" style="max-height: 150px;" alt="About Us">
+                    </div>
+                    <div class="col-md-9">
+                        <h3 class="section-title">Tentang Kami</h3>
+                        <p class="text-muted">
+                            Marhaban Perfume telah berkarya sejak tahun 2017 dan didirikan oleh Bapak Syarif Salim
+                            Bahanan. Kami
+                            menyediakan berbagai jenis parfum berkualitas dan melayani pengiriman ke seluruh Indonesia.
+                            Toko
+                            kami berlokasi di Jl. Empang No.31B, Empang, Kota Bogor, Jawa Barat 16132.
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Modal Tambah Produk -->
-            <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addProductModalLabel">Tambah Produk</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="add_product.php" method="POST" enctype="multipart/form-data">
-                                <div class="mb-3">
+            <!-- How to Order Section -->
+            <!-- <div id="caraorder" class="bg-white p-5 rounded-3 shadow-sm">
+                <div class="row align-items-center">
+                    <div class="col-md-9 order-2 order-md-1">
+                        <h3 class="section-title">Cara Order</h3>
+                        <p class="text-muted">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem praesentium optio,
+                            asperiores et
+                            illum nam. Natus tempore ad sint eius deleniti autem aliquam nam adipisci atque quaerat
+                            libero et
+                            quisquam placeat deserunt, quae explicabo exercitationem voluptate nostrum facere ut error
+                            quam
+                            itaque dolorem! Exercitationem, sapiente in? Aliquam distinctio incidunt illo!
+                        </p>
+                    </div>
+                    <div class="col-md-3 text-center order-1 order-md-2 mb-4 mb-md-0">
+                        <img src="images/order.png" class="img-fluid" style="max-height: 150px;" alt="How to Order">
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+            <!-- Footer -->
+            <footer class="bg-dark text-white py-4">
+                <div class="container">
+                    <div class="text-center">
+                        <p class="mb-0">&copy; 2025 Marhaban Perfume. - Pusat Grosir Parfume Berkualitas</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Modal Tambah Produk -->
+        <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="addProductModalLabel">
+                            <i class="fas fa-plus-circle me-2"></i>Tambah Produk Baru
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="add_product.php" method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
                                     <label for="name" class="form-label">Nama Produk</label>
                                     <input type="text" id="name" name="name" class="form-control"
                                         placeholder="Nama Produk" required>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="col-md-6 mb-3">
                                     <label for="category_id" class="form-label">Kategori</label>
                                     <select name="category_id" class="form-select" required>
                                         <option value="">-- Pilih Kategori --</option>
                                         <?php
-                                        include 'db.php'; // jika belum dimasukkan
+                                        include 'db.php';
                                         $result = mysqli_query($conn, "SELECT * FROM categories");
                                         while ($cat = mysqli_fetch_assoc($result)) {
                                             echo "<option value='{$cat['id']}'>{$cat['name']}</option>";
@@ -148,216 +492,173 @@ header("Expires: 0");
                                         ?>
                                     </select>
                                 </div>
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="description" class="form-label">Deskripsi Produk</label>
-                                    <textarea id="description" name="description" class="form-control"
-                                        placeholder="Deskripsi Produk" required></textarea>
-                                </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Deskripsi Produk</label>
+                                <textarea id="description" name="description" class="form-control" rows="3"
+                                    placeholder="Deskripsi Produk"></textarea>
+                            </div>
 
-                                <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
                                     <label for="price" class="form-label">Harga</label>
-                                    <input type="number" id="price" name="price" class="form-control"
-                                        placeholder="Harga" required>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="number" id="price" name="price" class="form-control"
+                                            placeholder="Harga" required>
+                                    </div>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="col-md-6 mb-3">
                                     <label for="image" class="form-label">Gambar Produk</label>
                                     <input type="file" id="image" name="image" class="form-control" required>
                                 </div>
+                            </div>
 
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Batal</button>
-                                    <button type="submit" class="btn btn-primary">Tambah Produk</button>
+                            <div class="modal-footer border-top-0">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-1"></i> Batal
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i> Simpan Produk
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Produk -->
+        <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <form action="update_product.php" method="POST" enctype="multipart/form-data" class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-edit me-2"></i>Edit Produk
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="edit-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-name" class="form-label">Nama Produk</label>
+                                <input type="text" name="name" id="edit-name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-price" class="form-label">Harga</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number" name="price" id="edit-price" class="form-control" required>
                                 </div>
-                            </form>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-description" class="form-label">Deskripsi</label>
+                            <textarea name="description" id="edit-description" class="form-control" rows="3"
+                                required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-image" class="form-label">Gambar Baru (Opsional)</label>
+                            <input type="file" name="image" id="edit-image" class="form-control">
+                            <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
                         </div>
                     </div>
-                </div>
+                    <div class="modal-footer border-top-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i> Batal
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
             </div>
-
-
         </div>
 
-        <div id="kumpulan_katalog" class="row row-cols-md-3 row-cols-2 gx-5 p-5">
-            <?php
-            include 'db.php';
-
-            if (!$conn) {
-                die("Koneksi database gagal: " . mysqli_connect_error());
-            }
-
-            if (isset($_GET['category_id'])) {
-                $category_id = intval($_GET['category_id']); // gunakan intval untuk keamanan
-                $result = mysqli_query($conn, "SELECT * FROM products WHERE category_id = $category_id");
-            } else {
-                $result = mysqli_query($conn, "SELECT * FROM products");
-            }
-
-            if (!$result) {
-                die("Query error: " . mysqli_error($conn));
-            }
-
-            while ($row = mysqli_fetch_assoc($result)) {
-                $name = htmlspecialchars($row["name"]);
-                $description = htmlspecialchars($row["description"]);
-                $price = number_format($row["price"], 0, ',', '.');
-                $image = !empty($row["image"]) ? "images/" . $row["image"] : "images/no-image.jpg";
-
-                echo "
-                    <div class='col mb-5 col mb-5 product-item' data-name='$name' data-description='$description'>
-                        <div class='card'>
-                            <img src='$image' class='card-img-top' alt='$name' />
-                            <div class='card-body'>
-                                <p class='card-text'>$name</p>
-                            </div>
-                            <div class='d-none deskripsi'>
-                                <p>$description</p>
-                            </div> 
-                            <div class='card-footer d-md-flex' style='gap:10px;'>
-                                <a class='btn btn-sm btn-primary d-block btnDetail'>Detail</a>
-                                <a href='#' class='btn btn-sm btn-danger d-block btnDelete' data-id='{$row['id']}'>Delete</a>
-                                <a href='#' class='btn btn-sm btn-success d-block btnEdit'
-                                    data-bs-toggle='modal' data-bs-target='#editProductModal'
-                                    data-id='{$row['id']}'
-                                    data-name='" . htmlspecialchars($row['name']) . "'
-                                    data-description='" . htmlspecialchars($row['description']) . "'
-                                    data-price='{$row['price']}'
-                                    data-image='{$row['image']}'>Edit
-                                </a>
-                                <span class='ms-auto text-danger fw-bold d-block text-center harga'>Rp. $price</span>
-                            </div>
+        <!-- modal detail produk -->
+        <div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="productDetailModalLabel">Detail Produk</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="col-md-6">
+                            <img id="detailImage" src="" class="img-fluid rounded" alt="Product Image">
                         </div>
-                    </div>";
-            }
-
-            ?>
-
-
-            < <div class="card-body">
-        </div>
-        <div class="d-none deskripsi"><!--class d none supaya tidak terlihat-->
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni laboriosam soluta ea illo
-                distinctio pariatur aut ipsum dolorum nam corporis fugit eaque ipsa similique autem tempore
-                esse eos nulla, et facere? Sint eos reprehenderit eligendi. Iste doloribus quasi sequi
-                quaerat perspiciatis, aliquid vero adipisci excepturi. </p>
-        </div>
-
-    </div>
-    <!-- Tentang Kami -->
-    <div class="px-4 py-4 bg-secondary text-center">
-        <div class="mx-auto w-75">
-            <h3 id="tentangkami" class="text-white">Tentang Kami</h3>
-            <p class="text-center text-white">
-                <img src="images/about-us.png" align="left" style="width:100px; height: auto;" class="me-3 mb-3" />
-                Marhaban Perfume telah berkarya sejak tahun 2017 dan didirikan oleh Bapak Syarif Salim Bahanan. Kami
-                menyediakan berbagai jenis parfum berkualitas dan melayani pengiriman ke seluruh Indonesia. Toko
-                kami berlokasi di Jl. Empang No.31B, Empang, Kota Bogor, Jawa Barat 16132.
-            </p>
-        </div>
-    </div>
-
-    <!-- Cara Order -->
-    <div class="px-4 py-4 bg-light text-center">
-        <div class="mx-auto w-75">
-            <h3 id="caraorder">Cara Order</h3>
-            <p class="text-center">
-                <img src="images/order.png" align="right" style="width:100px; height: auto;" class="ms-3 mb-3" />
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem praesentium optio, asperiores et
-                illum nam. Natus tempore ad sint eius deleniti autem aliquam nam adipisci atque quaerat libero et
-                quisquam placeat deserunt, quae explicabo exercitationem voluptate nostrum facere ut error quam
-                itaque dolorem! Exercitationem, sapiente in? Aliquam distinctio incidunt illo!
-            </p>
-        </div>
-    </div>
-    <!--copyright-->
-    <div class="text-center p-4 border-top">&copy; 2025 Marhaban Perfume. -Pusat Grosir Parfume Berkualitas</div>
-    </div>
-    <!--MODAL-->
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary d-none btnModal" data-bs-toggle="modal" data-bs-target="#exampleModal">
-        Launch demo modal
-    </button>
-
-    <!-- Modal Edit Produk -->
-    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <form action="update_product.php" method="POST" enctype="multipart/form-data" class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Produk</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="id" id="edit-id">
-                    <div class="mb-3">
-                        <label for="edit-name" class="form-label">Nama Produk</label>
-                        <input type="text" name="name" id="edit-name" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-description" class="form-label">Deskripsi</label>
-                        <textarea name="description" id="edit-description" class="form-control" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-price" class="form-label">Harga</label>
-                        <input type="number" name="price" id="edit-price" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-image" class="form-label">Gambar Baru (Opsional)</label>
-                        <input type="file" name="image" id="edit-image" class="form-control">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title modalTitle" id="exampleModalLabel"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body row">
-                    <div class="modalImage col-md-6 col-12"></div>
-                    <div class="col-md-6 col-12">
-                        <div class="modalDeskripsi"></div>
-                        <div class="d-md-flex">
-                            <a href="" target="_blank" class="btn btn-sm btn-warning d-block btnBeli">Beli Produk
-                                Ini</a>
-                            <span class="ms-auto text-danger fw-bold d-block text-center modalHarga"></span>
+                        <div class="col-md-6">
+                            <h3 id="detailTitle" class="mb-3"></h3>
+                            <div id="detailDescription" class="mb-4 text-muted"></div>
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <span id="detailPrice" class="price-tag"></span>
+                                <!-- <a href="#" target="_blank" class="btn btn-primary">
+                                    <i class="fas fa-shopping-cart me-1"></i> Beli Sekarang
+                                </a> -->
+                            </div>
+                            <!-- <a href="#" class="text-primary">
+                                <i class="fas fa-cart-plus me-1"></i> Tambahkan ke keranjang
+                            </a> -->
                         </div>
-                        <a style="" href="">tambahkan ke keranjang</a>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i> Tutup
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Bootstrap JS Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
-        <!-- Optional JavaScript; choose one of the two! -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
-            </script>
-
-        <script src="javascript/main.js"></script>
+        <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
-        <!-- modal delete-->
         <script>
+            // Product Detail Modal Handler
             $(document).ready(function () {
+                $('.btnDetail').click(function () {
+                    const card = $(this).closest('.card');
+                    const title = card.find('.card-title').text();
+                    const description = card.find('.deskripsi p').text();
+                    const price = card.find('.price-tag').text();
+                    const imageSrc = card.find('img').attr('src');
+
+                    $('#detailTitle').text(title);
+                    $('#detailDescription').text(description);
+                    $('#detailPrice').text(price);
+                    $('#detailImage').attr('src', imageSrc);
+
+                    $('#productDetailModal').modal('show');
+                });
+
+                // Live Search / Pencarian Langsung
+                $('#cari-list').on('keyup', function () {
+                    const keyword = $(this).val().toLowerCase();
+                    $('.product-item').each(function () {
+                        const name = $(this).data('name').toLowerCase();
+                        const description = $(this).data('description').toLowerCase();
+
+                        if (name.includes(keyword) || description.includes(keyword)) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                });
+
+                // Delete Product Confirmation
                 $('.btnDelete').click(function (e) {
-                    e.preventDefault(); // Mencegah buka halaman
+                    e.preventDefault();
 
                     if (!confirm("Yakin ingin menghapus produk ini?")) {
                         return;
@@ -372,7 +673,7 @@ header("Expires: 0");
                         success: function (response) {
                             if (response.trim() === 'success') {
                                 alert("Produk berhasil dihapus.");
-                                location.reload(); // Refresh halaman setelah hapus
+                                location.reload();
                             } else {
                                 alert("Gagal menghapus: " + response);
                             }
@@ -382,51 +683,21 @@ header("Expires: 0");
                         }
                     });
                 });
-            });
-        </script>
 
-        <script> //javascript edit
-            document.addEventListener("DOMContentLoaded", function () {
-                const editButtons = document.querySelectorAll(".btnEdit");
+                // Edit Product Modal Handler
+                $('.btnEdit').click(function () {
+                    const id = $(this).data('id');
+                    const name = $(this).data('name');
+                    const description = $(this).data('description');
+                    const price = $(this).data('price');
 
-                editButtons.forEach(button => {
-                    button.addEventListener("click", function () {
-                        const id = this.dataset.id;
-                        const name = this.dataset.name;
-                        const description = this.dataset.description;
-                        const price = this.dataset.price;
-
-                        document.getElementById("edit-id").value = id;
-                        document.getElementById("edit-name").value = name;
-                        document.getElementById("edit-description").value = description;
-                        document.getElementById("edit-price").value = price;
-                    });
+                    $('#edit-id').val(id);
+                    $('#edit-name').val(name);
+                    $('#edit-description').val(description);
+                    $('#edit-price').val(price);
                 });
             });
         </script>
-
-        <script> //logika searching
-            document.addEventListener('DOMContentLoaded', function () {
-                // Live Search
-                document.getElementById('cari-list').addEventListener('keyup', function () {
-                    const keyword = this.value.toLowerCase();
-                    const items = document.querySelectorAll('.product-item');
-
-                    items.forEach(function (item) {
-                        const name = item.getAttribute('data-name').toLowerCase();
-                        const description = item.getAttribute('data-description').toLowerCase();
-
-                        if (name.includes(keyword) || description.includes(keyword)) {
-                            item.style.display = '';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                });
-            });
-        </script>
-
-
 </body>
 
 </html>

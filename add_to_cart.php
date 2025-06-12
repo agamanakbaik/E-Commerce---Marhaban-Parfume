@@ -1,28 +1,62 @@
 <?php
 session_start();
-include 'db.php'; // Koneksi ke database
+// Cek apakah tombol "add_to_cart" ditekan
+if (isset($_POST['add_to_cart'])) {
+    // Validasi input
+    if (empty($_POST['product_id']) || empty($_POST['product_name']) || !isset($_POST['product_price'])) {
+        die("Data produk tidak lengkap");
+    }
 
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = rand(1000, 9999); // ID sementara jika belum login
-}
+    // Bersihkan input
+    $product_id = intval($_POST['product_id']);
+    $product_name = htmlspecialchars($_POST['product_name']);
+    $product_price = floatval($_POST['product_price']);
+    $product_image = htmlspecialchars($_POST['product_image']);
+    $product_quantity = intval($_POST['product_quantity']);
+    //$quantity = 1;
+    // Validasi harga tidak boleh negatif
+    if ($product_price < 0) {
+        die("Harga produk tidak valid");
+    }
 
-$user_id = $_SESSION['user_id'];
-$product_id = $_POST['product_id'];
+    // Siapkan item sebagai array
+    $item = [
+        'id' => $product_id,
+        'name' => $product_name,
+        'price' => $product_price,
+        'image' => $product_image,
+        'quantity' => $product_quantity
+    ];
 
-// Cek apakah produk sudah ada di keranjang
-$check_query = "SELECT * FROM cart WHERE user_id = '$user_id' AND product_id = '$product_id'";
-$check_result = mysqli_query($conn, $check_query);
+    // Inisialisasi keranjang jika belum ada
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
 
-if (mysqli_num_rows($check_result) > 0) {
-    // Jika sudah ada, tambahkan quantity
-    $update_query = "UPDATE cart SET quantity = quantity + 1 WHERE user_id = '$user_id' AND product_id = '$product_id'";
-    mysqli_query($conn, $update_query);
-} else {
+    // Cek apakah produk sudah ada di keranjang
+    $found = false;
+    foreach ($_SESSION['cart'] as &$cart_item) {
+        //while ($_SESSION['cart'] = $item) {
+            if ($cart_item['id'] == $product_id) {
+                $cart_item['quantity'] += $product_quantity ;
+                $found = true;
+                break;
+            }
+        //}
+    }
+
     // Jika belum ada, tambahkan ke keranjang
-    $insert_query = "INSERT INTO cart (user_id, product_id, quantity) VALUES ('$user_id', '$product_id', 1)";
-    mysqli_query($conn, $insert_query);
-}
+    if (!$found) {
+        $_SESSION['cart'][] = $item;
+    }
 
-header("Location: keranjang.php");
-exit();
+    // Redirect kembali ke halaman produk dengan pesan sukses
+    $_SESSION['message'] = "Produk $product_name berhasil ditambahkan ke keranjang!";
+    header("Location: ".$_SERVER['HTTP_REFERER']);
+    exit();
+} else {
+    // Jika akses langsung ke file
+    header("Location: index.php");
+    exit();
+}
 ?>
