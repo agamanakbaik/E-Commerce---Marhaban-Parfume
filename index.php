@@ -1,6 +1,8 @@
 <?php
 session_start();
+$isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,6 +21,10 @@ session_start();
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+
+    <!--  SweetAlert2 untuk perinngatan keranjang -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <!-- Custom CSS -->
     <style>
@@ -265,11 +271,19 @@ session_start();
                 <a href="#tentangkami" class="nav-link">Tentang Kami</a>
                 <a href="#caraorder" class="nav-link">Cara Order</a>
 
-                <a href="keranjang.php" class="nav-link cart-icon">
+                <a href="#" id="keranjang-btn" class="nav-link cart-icon">
                     <i class="fas fa-shopping-cart text-xl"></i>
                     <span class="cart-count">0</span>
                 </a>
+
+
+                <!-- Login & Registrasi -->
+                <a href="loginpelanggan.php"
+                    class="text-sm font-medium text-gray-700 hover:text-[#099ea3] transition">Login</a>
+                <a href="registrasi_pelanggan.php"
+                    class="ml-2 text-sm font-medium text-white bg-[#099ea3] hover:bg-[#077c7f] px-4 py-1.5 rounded transition">Registrasi</a>
             </div>
+        </div>
     </nav>
 
     <!-- Banner -->
@@ -319,7 +333,7 @@ session_start();
             if (!$conn) {
                 die("Koneksi database gagal: " . mysqli_connect_error());
             }
-            
+
             if (isset($_GET['category_id'])) {
                 $category_id = $_GET["category_id"];
                 $result = mysqli_query($conn, "SELECT * FROM products WHERE category_id = $category_id");
@@ -338,7 +352,7 @@ session_start();
                 $price = number_format($row["price"], 0, ',', '.');
                 $image = !empty($row["image"]) ? "images/" . $row["image"] : "images/no-image.jpg";
                 $category_id = htmlspecialchars($row["category_id"]);
-                
+
                 echo "
                 <div class='product-card bg-white rounded-xl overflow-hidden shadow-md product-item' 
                      data-name='$name' 
@@ -523,11 +537,12 @@ session_start();
 
                         <!-- Action Buttons -->
                         <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                            <a href="#" target="_blank"
-                                class="buy-btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex-1 flex items-center justify-center space-x-2">
-                                <i class="fas fa-bolt"></i>
-                                <span>Beli Sekarang</span>
-                            </a>
+
+                            <button id="WA"
+                                class="buy-btn bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex-1 flex items-center justify-center space-x-2">
+                                <i class="fab fa-whatsapp text-2xl"></i> <!-- logo WA besar -->
+                                <span>Hubungi via WhatsApp</span>
+                            </button>
 
                             <form method="post" action="add_to_cart.php" class="flex-1" enctype="multipart/form-data">
                                 <input type="hidden" class="product_id" name="product_id" value="">
@@ -535,7 +550,12 @@ session_start();
                                 <input type="hidden" class="product_price" name="product_price" value="">
                                 <input type="hidden" class="product_image" name="product_image" value="">
                                 <input type="hidden" class="product_quantity" name="product_quantity" value="">
-                                <button type="submit" name="add_to_cart"
+                                <input type="hidden" class="product_size" name="product_size" value="">
+
+                                <!--  Ini  input ukuran -->
+                                <input type="hidden" class="product_size" name="product_size" value="1000ml">
+
+                                <button type="submit" name="add_to_cart" id="tambah-keranjang"
                                     class="w-full bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
                                     <i class="fas fa-shopping-cart"></i>
                                     <span>+ Keranjang</span>
@@ -555,48 +575,48 @@ session_start();
 
     <!-- JavaScript -->
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Fungsi modal detail produk
-        const detailButtons = document.querySelectorAll('.detail-btn');
-        detailButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                e.preventDefault();
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fungsi modal detail produk
+            const detailButtons = document.querySelectorAll('.detail-btn');
+            detailButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
 
-                const productCard = this.closest('.product-card');
-                const productId = productCard.querySelector('input').value;
-                const productName = productCard.querySelector('h3').textContent;
-                const productPrice = productCard.querySelector('.harga').textContent;
-                const productImage = productCard.querySelector('.product-image').src;
-                const productCategory = productCard.dataset.category;
-                const productDescription = productCard.dataset.description;
+                    const productCard = this.closest('.product-card');
+                    const productId = productCard.querySelector('input').value;
+                    const productName = productCard.querySelector('h3').textContent;
+                    const productPrice = productCard.querySelector('.harga').textContent;
+                    const productImage = productCard.querySelector('.product-image').src;
+                    const productCategory = productCard.dataset.category;
+                    const productDescription = productCard.dataset.description;
 
-                // Set input hidden
-                document.querySelector('.product_id').value = productId;
-                document.querySelector('.product_name').value = productName;
-                let cleanedPrice = productPrice.replace(/[^\d]/g, '');
-                document.querySelector('.product_price').value = cleanedPrice;
-                document.querySelector('.product_image').value = productImage;
-                document.querySelector('.product_quantity').value = 1;
+                    // Set input hidden
+                    document.querySelector('.product_id').value = productId;
+                    document.querySelector('.product_name').value = productName;
+                    let cleanedPrice = productPrice.replace(/[^\d]/g, '');
+                    document.querySelector('.product_price').value = cleanedPrice;
+                    document.querySelector('.product_image').value = productImage;
+                    document.querySelector('.product_quantity').value = 1;
 
-                // Isi modal
-                document.getElementById('productModalLabel').textContent = productName;
-                document.querySelector('.modal-image').src = productImage;
-                document.querySelector('.modal-description').innerHTML = `<p>${productDescription}</p>`;
+                    // Isi modal
+                    document.getElementById('productModalLabel').textContent = productName;
+                    document.querySelector('.modal-image').src = productImage;
+                    document.querySelector('.modal-description').innerHTML = `<p>${productDescription}</p>`;
 
-                // Set WhatsApp link
-                const whatsappLink = `https://wa.me/6289510175754?text=Saya%20tertarik%20dengan%20produk%20${encodeURIComponent(productName)}%20dengan%20harga%20${encodeURIComponent(productPrice)}.%20Apakah%20produk%20ini%20tersedia?`;
-                document.querySelector('.buy-btn').href = whatsappLink;
+                    // Set WhatsApp link
+                    const whatsappLink = `https://wa.me/6289510175754?text=Saya%20tertarik%20dengan%20produk%20${encodeURIComponent(productName)}%20dengan%20harga%20${encodeURIComponent(productPrice)}.%20Apakah%20produk%20ini%20tersedia?`;
+                    document.querySelector('.buy-btn').href = whatsappLink;
 
-                // Tampilkan modal
-                const modal = new bootstrap.Modal(document.getElementById('productModal'));
-                modal.show();
+                    // Tampilkan modal
+                    const modal = new bootstrap.Modal(document.getElementById('productModal'));
+                    modal.show();
 
-                // Handle size options based on category
-                const sizeOptionsContainer = document.querySelector('.size-options');
-                sizeOptionsContainer.innerHTML = ''; // Clear previous options
+                    // Handle size options based on category
+                    const sizeOptionsContainer = document.querySelector('.size-options');
+                    sizeOptionsContainer.innerHTML = ''; // Clear previous options
 
-                if (productCategory === '1') { // Bibit Parfume
-                    sizeOptionsContainer.innerHTML = `
+                    if (productCategory === '1') { // Bibit Parfume
+                        sizeOptionsContainer.innerHTML = `
                         <h4 class="font-medium text-gray-900">Pilih Ukuran:</h4>
                         <div class="grid grid-cols-2 gap-3">
                             <button class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors" 
@@ -617,8 +637,8 @@ session_start();
                             </button>
                         </div>
                     `;
-                } else if (productCategory === '2') { // Botol Parfume
-                    sizeOptionsContainer.innerHTML = `
+                    } else if (productCategory === '2') { // Botol Parfume
+                        sizeOptionsContainer.innerHTML = `
                         <h4 class="font-medium text-gray-900">Pilih Ukuran:</h4>
                         <div class="grid grid-cols-2 gap-3">
                             <button class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors" 
@@ -631,123 +651,224 @@ session_start();
                             </button>
                         </div>
                     `;
-                }
-                // Untuk kategori 3 (Paket Usaha) tidak menampilkan opsi ukuran
-
-                // Initialize price and quantity
-                let currentQuantity = 1;
-                const quantityInput = document.querySelector('.quantity-input');
-                const priceElement = document.querySelector('.modal-price');
-                const productPriceInput = document.querySelector('.product_price');
-                const productQuantityInput = document.querySelector('.product_quantity');
-
-                function updateTotalPrice() {
-                    productQuantityInput.value = quantityInput.value;
-                    
-                    // Jika ada tombol ukuran yang aktif (kategori 1 atau 2)
-                    const activeSizeBtn = document.querySelector('.size-btn.border-blue-500');
-                    if (activeSizeBtn) {
-                        const basePrice = parseInt(activeSizeBtn.getAttribute('data-price'));
-                        const totalPrice = basePrice * quantityInput.value;
-                        productPriceInput.value = totalPrice;
-                        priceElement.textContent = 'Rp. ' + totalPrice.toLocaleString('id-ID');
-                    } else {
-                        // Untuk kategori tanpa ukuran (paket usaha)
-                        const totalPrice = parseInt(cleanedPrice) * quantityInput.value;
-                        productPriceInput.value = totalPrice;
-                        priceElement.textContent = 'Rp. ' + totalPrice.toLocaleString('id-ID');
                     }
-                }
+                    // Untuk kategori 3 (Paket Usaha) tidak menampilkan opsi ukuran
 
-                // Set initial price
-                quantityInput.value = currentQuantity;
-                updateTotalPrice();
+                    // Initialize price and quantity
+                    let currentQuantity = 1;
+                    const quantityInput = document.querySelector('.quantity-input');
+                    const priceElement = document.querySelector('.modal-price');
+                    const productPriceInput = document.querySelector('.product_price');
+                    const productQuantityInput = document.querySelector('.product_quantity');
 
-                // Quantity minus
-                document.querySelectorAll('.qty-minus').forEach(btn => {
-                    btn.onclick = function () {
-                        if (currentQuantity > 1) {
-                            currentQuantity--;
+                    // function updateTotalPrice() {
+                    //     productQuantityInput.value = quantityInput.value;
+
+                    //     // Jika ada tombol ukuran yang aktif (kategori 1 atau 2)
+                    //     const activeSizeBtn = document.querySelector('.size-btn.border-blue-500');
+                    //     if (activeSizeBtn) {
+                    //         const basePrice = parseInt(activeSizeBtn.getAttribute('data-price'));
+                    //         const totalPrice = basePrice * quantityInput.value;
+                    //         productPriceInput.value = totalPrice;
+                    //         priceElement.textContent = 'Rp. ' + totalPrice.toLocaleString('id-ID');
+                    //     } else {
+                    //         // Untuk kategori tanpa ukuran (paket usaha)
+                    //         const totalPrice = parseInt(cleanedPrice) * quantityInput.value;
+                    //         productPriceInput.value = totalPrice;
+                    //         priceElement.textContent = 'Rp. ' + totalPrice.toLocaleString('id-ID');
+                    //     }
+                    // }
+
+                    function updateTotalPrice() {
+                        productQuantityInput.value = quantityInput.value;
+
+                        let selectedSize = '';
+                        let totalPrice = 0;
+
+                        // Jika ada tombol ukuran yang aktif
+                        const activeSizeBtn = document.querySelector('.size-btn.border-blue-500');
+                        if (activeSizeBtn) {
+                            const basePrice = parseInt(activeSizeBtn.getAttribute('data-price'));
+                            selectedSize = activeSizeBtn.getAttribute('data-size');
+                            totalPrice = basePrice * quantityInput.value;
+
+                            // ✅ Set nilai input hidden ukuran
+                            document.querySelector('.product_size').value = selectedSize;
+                        } else {
+                            totalPrice = parseInt(cleanedPrice) * quantityInput.value;
+                        }
+
+                        // Update harga & input tersembunyi
+                        productPriceInput.value = totalPrice;
+                        priceElement.textContent = 'Rp. ' + totalPrice.toLocaleString('id-ID');
+
+                        // Update size
+                        document.querySelector('.product_size').value = selectedSize;
+
+
+                        // Update WhatsApp link
+                        const productNameText = document.getElementById('productModalLabel').textContent;
+                        const quantity = quantityInput.value;
+
+                        let message = `Halo, saya tertarik dengan produk berikut:\n`;
+                        message += `Nama: ${productNameText}\n`;
+                        if (selectedSize) message += `Ukuran: ${selectedSize}\n`;
+                        message += `Jumlah: ${quantity}\n`;
+                        message += `Total Harga: Rp ${totalPrice.toLocaleString('id-ID')}\n`;
+                        message += `Apakah produk ini tersedia?`;
+
+                        const whatsappNumber = "6289510175754"; // Ganti sesuai nomor WA-mu
+                        const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+                        document.querySelector('.buy-btn').href = whatsappLink;
+                    }
+
+
+                    // Set initial price
+                    quantityInput.value = currentQuantity;
+                    updateTotalPrice();
+
+                    // Quantity minus
+                    document.querySelectorAll('.qty-minus').forEach(btn => {
+                        btn.onclick = function () {
+                            if (currentQuantity > 1) {
+                                currentQuantity--;
+                                quantityInput.value = currentQuantity;
+                                updateTotalPrice();
+                            }
+                        };
+                    });
+
+                    // Quantity plus
+                    document.querySelectorAll('.qty-plus').forEach(btn => {
+                        btn.onclick = function () {
+                            currentQuantity++;
                             quantityInput.value = currentQuantity;
                             updateTotalPrice();
+                        };
+                    });
+
+                    // Manual input quantity
+                    quantityInput.onchange = function () {
+                        const newValue = parseInt(this.value);
+                        if (!isNaN(newValue) && newValue >= 1) {
+                            currentQuantity = newValue;
+                            updateTotalPrice();
+                        } else {
+                            this.value = currentQuantity;
                         }
                     };
-                });
 
-                // Quantity plus
-                document.querySelectorAll('.qty-plus').forEach(btn => {
-                    btn.onclick = function () {
-                        currentQuantity++;
-                        quantityInput.value = currentQuantity;
-                        updateTotalPrice();
-                    };
-                });
+                    // Size selection (only for categories 1 and 2)
+                    if (productCategory === '1' || productCategory === '2') {
+                        // Set default selected size
+                        setTimeout(() => {
+                            const defaultSizeBtn = productCategory === '1'
+                                ? document.querySelector('.size-btn[data-size="1000ml"]')
+                                : document.querySelector('.size-btn[data-size="12 Lusin"]');
 
-                // Manual input quantity
-                quantityInput.onchange = function () {
-                    const newValue = parseInt(this.value);
-                    if (!isNaN(newValue) && newValue >= 1) {
-                        currentQuantity = newValue;
-                        updateTotalPrice();
-                    } else {
-                        this.value = currentQuantity;
+                            if (defaultSizeBtn) {
+                                defaultSizeBtn.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
+                                defaultSizeBtn.classList.remove('border-gray-300');
+                                updateTotalPrice();
+                            }
+                        }, 100);
+
+                        // Handle size button clicks
+                        document.addEventListener('click', function (e) {
+                            if (e.target.classList.contains('size-btn')) {
+                                e.preventDefault();
+                                document.querySelectorAll('.size-btn').forEach(btn => {
+                                    btn.classList.remove('border-blue-500', 'text-blue-600', 'bg-blue-50');
+                                    btn.classList.add('border-gray-300');
+                                });
+                                e.target.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
+                                e.target.classList.remove('border-gray-300');
+                                updateTotalPrice();
+                            }
+                        });
                     }
-                };
+                });
+            });
 
-                // Size selection (only for categories 1 and 2)
-                if (productCategory === '1' || productCategory === '2') {
-                    // Set default selected size
-                    setTimeout(() => {
-                        const defaultSizeBtn = productCategory === '1' 
-                            ? document.querySelector('.size-btn[data-size="1000ml"]')
-                            : document.querySelector('.size-btn[data-size="12 Lusin"]');
-                        
-                        if (defaultSizeBtn) {
-                            defaultSizeBtn.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
-                            defaultSizeBtn.classList.remove('border-gray-300');
-                            updateTotalPrice();
-                        }
-                    }, 100);
+            // Fungsi pencarian
+            const searchInput = document.getElementById('cari-list');
+            searchInput.addEventListener('keyup', function () {
+                const searchTerm = this.value.toLowerCase();
+                const productItems = document.querySelectorAll('.product-item');
 
-                    // Handle size button clicks
-                    document.addEventListener('click', function(e) {
-                        if (e.target.classList.contains('size-btn')) {
-                            e.preventDefault();
-                            document.querySelectorAll('.size-btn').forEach(btn => {
-                                btn.classList.remove('border-blue-500', 'text-blue-600', 'bg-blue-50');
-                                btn.classList.add('border-gray-300');
-                            });
-                            e.target.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
-                            e.target.classList.remove('border-gray-300');
-                            updateTotalPrice();
-                        }
+                productItems.forEach(item => {
+                    const name = item.getAttribute('data-name').toLowerCase();
+                    const description = item.getAttribute('data-description').toLowerCase();
+
+                    if (name.includes(searchTerm) || description.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // klik keranjang? sudah login atau belum
+        document.addEventListener('DOMContentLoaded', function () {
+            const isLoggedIn = <?= $isLoggedIn ?>; //status login
+
+            document.getElementById('keranjang-btn').addEventListener('click', function (e) {
+                e.preventDefault();
+
+                if (!isLoggedIn) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Login Diperlukan',
+                        text: 'Silakan login terlebih dahulu untuk mengakses keranjang.',
+                        confirmButtonColor: '#099ea3'
                     });
                 }
             });
         });
 
-        // Fungsi pencarian
-        const searchInput = document.getElementById('cari-list');
-        searchInput.addEventListener('keyup', function () {
-            const searchTerm = this.value.toLowerCase();
-            const productItems = document.querySelectorAll('.product-item');
+        // klik pesan via WA? sudah login atau belum
+        document.addEventListener('DOMContentLoaded', function () {
+            const isLoggedIn = <?= $isLoggedIn ?>; //status login
 
-            productItems.forEach(item => {
-                const name = item.getAttribute('data-name').toLowerCase();
-                const description = item.getAttribute('data-description').toLowerCase();
+            document.getElementById('WA').addEventListener('click', function (e) {
+                e.preventDefault();
 
-                if (name.includes(searchTerm) || description.includes(searchTerm)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
+                if (!isLoggedIn) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Login Diperlukan',
+                        text: 'Silakan login terlebih dahulu untuk memesan produk.',
+                        confirmButtonColor: '#099ea3'
+                    });
                 }
             });
         });
-    });
-    </script>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+        // klik tambah produk ke keranjang? sudah login atau belum
+        document.addEventListener('DOMContentLoaded', function () {
+            const isLoggedIn = <?= $isLoggedIn ?>; //status login
+
+            document.getElementById('tambah-keranjang').addEventListener('click', function (e) {
+                e.preventDefault();
+
+                if (!isLoggedIn) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Login Diperlukan',
+                        text: 'Silakan login terlebih dahulu untuk menambahkan produk.',
+                        confirmButtonColor: '#099ea3'
+                    });
+                }
+            });
+        }); 
+    </script>
 </body>
 
 </html>

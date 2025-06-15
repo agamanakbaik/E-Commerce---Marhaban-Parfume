@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($conn->query($sql) === TRUE) {
         // Kosongkan keranjang setelah berhasil checkout
         unset($_SESSION['cart']);
-        echo "<script>alert('Pesanan berhasil dibuat!'); window.location.href='index.php';</script>";
+        echo "<script>alert('Pesanan berhasil dibuat!'); window.location.href='halamanpelanggan.php';</script>";
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }

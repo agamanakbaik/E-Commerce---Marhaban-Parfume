@@ -14,7 +14,6 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
     $shipping = 25000;
     $total = $subtotal + $shipping;
     $whatsappMessage .= "\nSubtotal: Rp " . number_format($subtotal, 0, ',', '.');
-   // $whatsappMessage .= "\nOngkir: Rp " . number_format($shipping, 0, ',', '.');
     $whatsappMessage .= "\nTotal: Rp " . number_format($total, 0, ',', '.');
 } else {
     $whatsappMessage = "Keranjang Anda kosong.";
@@ -107,35 +106,14 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
             <?php
             include 'db.php'; // Pastikan koneksi database tersedia
             
-            // Di awal file sebelum loop
-/**if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
-    $cartIds = array_map(function($item) { return $item['id']; }, $_SESSION['cart']);
-    $idsString = implode(",", $cartIds);
-    $productsQuery = mysqli_query($conn, "SELECT * FROM products WHERE id IN ($idsString)");
-    $products = [];
-    while ($row = mysqli_fetch_assoc($productsQuery)) {
-        $products[$row['id']] = $row;
-    }
-    
-    // Kemudian dalam loop, Anda bisa mengakses:
-    $product = $products[$item['id']];
-}**/
-
-
             if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0):
                 $cartIds = array_map(function ($item) {
                     return $item['id'];
                 }, $_SESSION['cart']);
                 $idsString = implode(",", $cartIds);
                 $total = 0;
-                //$products = [];
                 foreach ($_SESSION['cart'] as $item):
-                    //$products[$item['id']] = $item;
-                    // Ambil data lengkap produk dari database berdasarkan ID
-                    //$productId = $item['id'];
-                    //$query = mysqli_query($conn, "SELECT * FROM products WHERE id = $productId");
-                    //$product = mysqli_fetch_assoc($query);
-            
+
                     if ($item): // Jika produk ditemukan di database
                         $image = !empty($item['image']) ? /** "images/" . **/ $item['image'] : "images/no-image.jpg";
                         $itemTotal = $item['price']; //* $item['quantity']; //* $item['quantity'];
@@ -145,6 +123,13 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                             <div class="flex-shrink-0 mb-4 md:mb-0 md:mr-4">
                                 <img src="<?= $image ?>" alt="<?= htmlspecialchars($item['name']) ?>"
                                     class="w-24 h-24 object-cover rounded">
+
+                                <h3 class="font-semibold text-lg text-dark"><?= htmlspecialchars($item['name']) ?></h3>
+
+                                <?php if (!empty($item['size'])): ?>
+                                    <p class="text-sm text-gray-500 mb-1">Ukuran: <?= htmlspecialchars($item['size']) ?></p>
+                                <?php endif; ?>
+
                             </div>
                             <div class="flex-grow">
                                 <div class="flex justify-between">
@@ -180,7 +165,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                     <i class="fas fa-shopping-cart text-5xl text-gray-300 mb-4"></i>
                     <h3 class="text-xl font-semibold text-gray-500 mb-2">Keranjang Belanja Kosong</h3>
                     <p class="text-gray-500 mb-6">Tambahkan produk ke keranjang untuk mulai berbelanja</p>
-                    <a href="index.php"
+                    <a href="halamanpelanggan.php"
                         class="inline-block bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-full transition duration-300">
                         <i class="fas fa-arrow-left mr-2"></i> Kembali Berbelanja
                     </a>
@@ -201,16 +186,12 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                 }
                 //$shipping = 25000;
                 $total = $subtotal //+ $shipping;
-                ?>
+                    ?>
                 <div class="flex justify-between">
                     <span class="text-gray-600">Subtotal (<?= isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0 ?>
                         produk)</span>
                     <span class="font-medium">Rp <?= number_format($subtotal) ?></span>
                 </div>
-                <!-- <div class="flex justify-between"> -->
-                    <!-- <span class="text-gray-600">Ongkos Kirim</span> -->
-                    <!-- <span class="font-medium">Rp <?= number_format($shipping) ?></span> -->
-                <!-- </div> -->
                 <div class="border-t border-gray-200 pt-3 flex justify-between">
                     <span class="font-semibold">Total Pembayaran</span>
                     <span class="font-bold text-primary text-xl">Rp <?= number_format($total) ?></span>

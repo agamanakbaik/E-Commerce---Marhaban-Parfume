@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['pelanggan'])) {
+    header("Location: loginpelanggan.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -10,6 +14,9 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Marhaban Parfume - Pusat Grosir Parfume Berkualitas</title>
 
+      <!-- Bootstrap CSS menu dropdown logout dan aku saya-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -19,6 +26,8 @@ session_start();
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+
+
 
     <!-- Custom CSS -->
     <style>
@@ -63,11 +72,8 @@ session_start();
         .product-image {
             width: 100%;
             height: auto;
-            /* agar tidak terpotong */
             object-fit: contain;
-            /* tampilkan seluruh gambar tanpa cropping */
             aspect-ratio: 4 / 3;
-            /* opsional: menjaga proporsi */
         }
 
         .price-tag {
@@ -185,12 +191,17 @@ session_start();
             transform: scale(1.1);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- Tambahkan di bagian atas konten utama -->
+    <!-- Alert Message -->
     <?php if (isset($_SESSION['message'])): ?>
         <div id="alert-box"
             class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 transition-opacity duration-500 ease-out"
@@ -210,15 +221,14 @@ session_start();
                 const alert = document.getElementById('alert-box');
                 if (alert) {
                     alert.style.opacity = '0';
-                    setTimeout(() => alert.remove(), 1000); // hilang setelah 0.5 detik fade out
+                    setTimeout(() => alert.remove(), 1000);
                 }
-            }, 500); // muncul selama 0.5 detik
+            }, 500);
         </script>
         <?php unset($_SESSION['message']); ?>
     <?php endif; ?>
 
-
-    <!-- navbar -->
+    <!-- Navbar -->
     <nav class="bg-white shadow-md py-4 px-6 lg:px-12">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center">
@@ -226,10 +236,8 @@ session_start();
                     <img src="./images/logo.png" alt="Foto Anda" class="h-12 w-12 mr-2">
                     <span>Marhaban Parfume</span> </a>
             </div>
-            <div class="hidden md:flex items-center space-x-8">
-                <!-- Wrapper/pembungkus -->
+            <div class="hidden md:flex items-center space-x-4">
                 <div class="relative inline-block">
-                    <!-- Tombol -->
                     <button onclick="toggleDropdown()"
                         class="flex items-center gap-1 text-gray-700 font-medium hover:text-[#099ea3] transition">
                         Produk Kami
@@ -237,7 +245,6 @@ session_start();
                             class="fas fa-chevron-down text-xs mt-0.5 transition-transform duration-300"></i>
                     </button>
 
-                    <!-- Dropdown Menu -->
                     <div id="dropdownMenu"
                         class="absolute left-0 hidden bg-white shadow-lg rounded-md mt-2 py-2 w-48 z-10">
                         <a href="index.php" class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Semua
@@ -251,7 +258,6 @@ session_start();
                     </div>
                 </div>
 
-                <!-- Script -->
                 <script>
                     function toggleDropdown() {
                         const menu = document.getElementById('dropdownMenu');
@@ -260,7 +266,6 @@ session_start();
                         icon.classList.toggle('rotate-180');
                     }
 
-                    // Optional: klik luar nutup menu
                     document.addEventListener('click', function (e) {
                         const btn = e.target.closest('button');
                         const menu = document.getElementById('dropdownMenu');
@@ -279,23 +284,27 @@ session_start();
                     <span class="cart-count">0</span>
                 </a>
 
-                <!-- <div class="relative group">
-                    <button class="flex items-center space-x-1">
-                        <img src="https://ui-avatars.com/api/?name=User&background=6b46c1&color=fff"
-                            class="w-8 h-8 rounded-full border-2 border-purple-200">
-                    </button> 
-                    <div
-                        class="absolute right-0 hidden group-hover:block bg-white shadow-lg rounded-md mt-2 py-2 w-48 z-10">
-                        <a href="#" class="block px-4 py-2 hover:bg-purple-50 text-gray-700">Akun Saya</a>
-                        <a href="logout.php" class="block px-4 py-2 hover:bg-purple-50 text-gray-700">Logout</a>
+                <!-- dropdown menu logout -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-danger" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="background-color: #fff; border: #fff; color: #212529; margin-bottom: 7px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-baseline-density-medium">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M4 20h16" />
+                                <path d="M4 12h16" />
+                                <path d="M4 4h16" />
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Akun Saya</a></li>
+                            <li><a class="dropdown-item" href="logout_pelanggan.php">Logout</a></li>
+                        </ul>
                     </div>
-                </div>
             </div>
-
-            <button class="md:hidden text-gray-600 focus:outline-none">
-                <i class="fas fa-bars text-2xl"></i>
-            </button>  -->
-            </div>
+        </div>
     </nav>
 
     <!-- Banner -->
@@ -316,7 +325,7 @@ session_start();
         </div>
     </div>
 
-    <!-- Bagian Produkk -->
+    <!-- Products Section -->
     <section id="products" class="py-12 px-6 lg:px-12 max-w-7xl mx-auto">
         <div class="text-center mb-12">
             <h2 class="section-title text-3xl font-bold text-gray-800">Our Collection</h2>
@@ -330,69 +339,67 @@ session_start();
         </div>
 
         <div class="flex justify-end mb-8">
-            <div class="relative w-full md:w-1/3">
+            <div class="relative w-full md:w-1/3 max-w-md">
                 <input type="text" id="cari-list" placeholder="Cari produk..."
-                    class="search-box w-full pl-10 pr-5 py-3 focus:outline-none">
+                    class="search-box w-full pl-10 pr-5 py-3 focus:outline-none border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-200 rounded-lg">
                 <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                <span id="search-count" class="absolute right-3 top-3.5 text-gray-500 text-sm hidden"></span>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8" id="product-container">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="product-container">
             <?php
             include 'db.php';
 
-            // Pastikan koneksi database tersedia
             if (!$conn) {
                 die("Koneksi database gagal: " . mysqli_connect_error());
             }
+
             if (isset($_GET['category_id'])) {
                 $category_id = $_GET["category_id"];
-                // Ambil data dari tabel products
                 $result = mysqli_query($conn, "SELECT * FROM products WHERE category_id = $category_id");
-            } else if (!isset($_GET['category_id'])) {
-                $result = mysqli_query($conn, "SELECT * FROM products ");
             } else {
-                echo "Parameter category_id tidak ditemukan.";
+                $result = mysqli_query($conn, "SELECT * FROM products");
             }
-
 
             if (!$result) {
                 die("Query error: " . mysqli_error($conn));
             }
 
             while ($row = mysqli_fetch_assoc($result)) {
-                // Pastikan data aman untuk ditampilkan
                 $id = htmlspecialchars($row["id"]);
                 $name = htmlspecialchars($row["name"]);
                 $description = htmlspecialchars($row["description"]);
-                $price = number_format($row["price"], 0, ',', '.'); // Format harga
-                $image = !empty($row["image"]) ? "images/" . $row["image"] : "images/no-image.jpg"; // Fallback jika gambar kosong
-            
+                $price = number_format($row["price"], 0, ',', '.');
+                $image = !empty($row["image"]) ? "images/" . $row["image"] : "images/no-image.jpg";
+                $category_id = htmlspecialchars($row["category_id"]);
+
                 echo "
-                    
-                    <div class= 'product-card bg-white rounded-xl overflow-hidden shadow-md product-item' data-name='$name' data-description='$description'>
+                <div class='product-card bg-white rounded-xl overflow-hidden shadow-md product-item' 
+                     data-name='$name' 
+                     data-description='$description'
+                     data-category='$category_id'>
                     <input type='hidden' value='$id'>
-                    <div style=';width:373.33px;height:384px;'>
+                    <div>
                         <img src='$image' style='max-height: 100%; max-width: 100%; object-fit: contain;' class='w-full h-96 object-contain product-image' alt='$name' />
                     </div>
                     <div class='p-4 pb-6'>
-                            <h3 class='font-semibold text-lg mb-2'>$name</h3>
-                            <div class='flex justify-between items-center mt-4'>
-                                <a href='#' class='detail-btn px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium'>Detail</a>
-                                <span class='harga text-blue-600 font-bold'>Rp. $price</span>
-                            </div>
-                        </div>
+                        <h3 class='font-semibold text-lg mb-2'>$name</h3>
                         <div class='d-none deskripsi'>
-                            <p  class='text-gray-700 mb-4 text-center'>$description</p>
-                        </div> 
-                    </div>";
-
+                            <p class='text-gray-700 mb-4 text-center hidden'>$description</p>
+                        </div>
+                        <div class='flex justify-between items-center mt-4'>
+                            <a href='#' class='detail-btn px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium'>Detail</a>
+                            <span class='harga text-blue-600 font-bold'>Rp. $price</span>
+                        </div>
+                    </div>
+                </div>";
             }
             ?>
         </div>
     </section>
 
-    <!-- About -->
+    <!-- About Section -->
     <section id="tentangkami" class="about-section py-16 px-6 lg:px-12">
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col lg:flex-row items-center">
@@ -400,8 +407,7 @@ session_start();
                     <h2 class="section-title text-3xl font-bold text-white mb-6">Tentang Kami</h2>
                     <p class="text-white mb-6">
                         Marhaban Perfume telah berkarya sejak tahun 2017 dan didirikan oleh Bapak Syarif Salim Bahanan.
-                        Kami
-                        menyediakan berbagai jenis parfum berkualitas dan melayani pengiriman ke seluruh Indonesia.
+                        Kami menyediakan berbagai jenis parfum berkualitas dan melayani pengiriman ke seluruh Indonesia.
                     </p>
                     <p class="text-white">
                         <i class="fas fa-map-marker-alt mr-2"></i> Jl. Empang No.31B, Empang, Kota Bogor, Jawa Barat
@@ -415,7 +421,7 @@ session_start();
         </div>
     </section>
 
-    <!-- Cara Order -->
+    <!-- Order Section -->
     <section id="caraorder" class="order-section py-16 px-6 lg:px-12">
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col lg:flex-row items-center">
@@ -424,8 +430,7 @@ session_start();
                     <p class="text-white mb-6">
                         Pilih produk yang diinginkan, lalu klik menu Detail. Jika hanya membeli satu produk, klik tombol
                         <span class="font-semibold">Beli Produk Ini</span>. Namun jika ingin membeli lebih dari satu
-                        produk, masukkan ke keranjang
-                        terlebih dahulu.
+                        produk, masukkan ke keranjang terlebih dahulu.
                     </p>
                     <div class="flex space-x-4">
                         <div class="bg-white bg-opacity-20 p-4 rounded-lg flex-1">
@@ -498,32 +503,7 @@ session_start();
         </div>
     </footer>
 
-    <?php
-    if (isset($_GET['category_id'])) {
-        $category_id = $_GET["category_id"];
-        // Ambil data dari tabel products
-        $result = mysqli_query($conn, "SELECT * FROM products WHERE category_id = $category_id");
-    } else if (!isset($_GET['category_id'])) {
-        $result = mysqli_query($conn, "SELECT * FROM products ");
-    } else {
-        echo "Parameter category_id tidak ditemukan.";
-    }
-
-
-    if (!$result) {
-        die("Query error: " . mysqli_error($conn));
-    }
-
-    /**while (**/
-    $row = mysqli_fetch_assoc($result);/**(**//** )) {**/
-    // Pastikan data aman untuk ditampilkan
-    $name = htmlspecialchars($row["name"]);
-    $description = htmlspecialchars($row["description"]);
-    $price = number_format($row["price"], 0, ',', '.'); // Format harga
-    $image = !empty($row["image"]) ? "images/" . $row["image"] : "images/no-image.jpg"; // Fallback jika gambar kosong
-    
-    ?>
-    <!-- Product Modal -->
+    <!--produk modal -->
     <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto bg-black bg-opacity-50"
         id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered relative w-auto pointer-events-none max-w-4xl my-8 mx-auto">
@@ -543,46 +523,22 @@ session_start();
                 <!-- Body -->
                 <div class="modal-body relative p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                    <!-- Gambar Produk -->
+                    <!-- Product Image -->
                     <div
                         class="modal-image-container flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
                         <img src="" alt="Product Image" class="modal-image w-full h-auto max-h-96 object-contain">
                     </div>
 
-                    <!-- Detail Produk -->
+                    <!-- Product Details -->
                     <div class="space-y-6">
 
-                        <!-- Deskripsi -->
+                        <!-- Description -->
                         <div class="modal-description text-gray-700 leading-relaxed"></div>
 
-                        <!-- Pilihan Ukuran -->
-                        <div class="size-options space-y-3">
-                            <h4 class="font-medium text-gray-900">Pilih Ukuran:</h4>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button
-                                    class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors"
-                                    data-size="100ml" data-price="150000">
-                                    100ml - Rp150.000
-                                </button>
-                                <button
-                                    class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors"
-                                    data-size="500ml" data-price="250000">
-                                    500ml - Rp250.000
-                                </button>
-                                <button
-                                    class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors"
-                                    data-size="1000ml" data-price="400000">
-                                    1000ml - Rp400.000
-                                </button>
-                                <button
-                                    class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors"
-                                    data-size="5000ml" data-price="607000">
-                                    5000ml - Rp607.000
-                                </button>
-                            </div>
-                        </div>
+                        <!-- Size Options (will be dynamically filled) -->
+                        <div class="size-options space-y-3"></div>
 
-                        <!-- Harga & Qty -->
+                        <!-- Price & Quantity -->
                         <div class="flex items-center justify-between">
                             <div>
                                 <span class="text-gray-500 text-sm">Total Harga:</span>
@@ -600,14 +556,13 @@ session_start();
                             </div>
                         </div>
 
-                        <!-- Tombol Aksi -->
-
+                        <!-- Action Buttons -->
                         <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                            <button
-                                class="buy-btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex-1 flex items-center justify-center space-x-2">
-                                <i class="fas fa-bolt"></i>
-                                <span>Beli Sekarang</span>
-                            </button>
+                            <a href="#" target="_blank"
+                                class="buy-btn bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex-1 flex items-center justify-center space-x-2">
+                                <i class="fab fa-whatsapp text-2xl"></i> <!-- logo WA besar -->
+                                <span>Hubungi via WhatsApp</span>
+                            </a>
 
                             <form method="post" action="add_to_cart.php" class="flex-1" enctype="multipart/form-data">
                                 <input type="hidden" class="product_id" name="product_id" value="">
@@ -615,120 +570,32 @@ session_start();
                                 <input type="hidden" class="product_price" name="product_price" value="">
                                 <input type="hidden" class="product_image" name="product_image" value="">
                                 <input type="hidden" class="product_quantity" name="product_quantity" value="">
+                                <input type="hidden" class="product_size" name="product_size" value="">
+
+                                <!--  Ini  input ukuran -->
+                                <input type="hidden" class="product_size" name="product_size" value="1000ml">
+
                                 <button type="submit" name="add_to_cart"
                                     class="w-full bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
                                     <i class="fas fa-shopping-cart"></i>
                                     <span>+ Keranjang</span>
                                 </button>
                             </form>
-
                         </div>
                     </div>
-                </div>s
+                </div>
             </div>
         </div>
     </div>
-    <?php
-    ?>
 
-    <script>
-        /**document.addEventListener('DOMContentLoaded', function () {
-            // Variabel untuk menyimpan harga dasar dan kuantitas/quantity
-            //let basePrice = 607000;
-            let currentQuantity = 1;
-            //let cleaned;
-            //const productCard = event.target.closest('.product-card');
-            const productPrice = document.querySelector('.product_price');
-            const priceElement = document.querySelector('.modal-price');
-            const quantityInput = document.querySelector('.quantity-input');
-            //const productPriceRow = document.querySelector('.harga').textContent;
-            const productPriceRow = document.querySelector('.harga').textContent;
-            
-            // Fungsi untuk update harga total
-            function updateTotalPrice() {
-                //console.log(quantityInput.value);
-                let cleaned = parseInt(productPriceRow.replace(/[^\d]/g, ''), 10); 
-                //let cleaned = productPriceRow.replace('Rp.', '').trim();
-                console.log(cleaned);
-                const totalPrice = cleaned * quantityInput.value;
-                console.log(totalPrice);
-                priceElement.textContent = 'Rp' + totalPrice.toLocaleString('id-ID');
-                //productPrice.value = priceElement.textContent;
-                //let rawText = priceElement.textContent;
-                productPrice.value = totalPrice;
-            }
-        
-            // Fungsi kuantitas/quantity minus
-            document.querySelectorAll('.qty-minus').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    if (currentQuantity > 1) {
-                        currentQuantity--;
-                        quantityInput.value = currentQuantity;
-                        updateTotalPrice();
-                    }
-                });
-            });
-
-            // Fungsi kuantitas/quantity plus
-            document.querySelectorAll('.qty-plus').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    currentQuantity++;
-                    quantityInput.value = currentQuantity;
-                    updateTotalPrice();
-                });
-            });
-
-            // Fungsi saat input quantity diubah manual
-            quantityInput.addEventListener('change', function () {
-                const newValue = parseInt(this.value);
-                if (!isNaN(newValue) && newValue >= 1) {
-                    currentQuantity = newValue;
-                    updateTotalPrice();
-                } else {
-                    this.value = currentQuantity;
-                }
-            });
-
-            // Fungsi pilihan ukuran
-            const sizeButtons = document.querySelectorAll('.size-btn');
-
-            sizeButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    // Hapus active class dari semua tombol
-                    sizeButtons.forEach(btn => {
-                        btn.classList.remove('border-blue-500', 'text-blue-600', 'bg-blue-50');
-                        btn.classList.add('border-gray-300');
-                    });
-
-                    // Tambah active class ke tombol yang diklik
-                    this.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
-                    this.classList.remove('border-gray-300');
-
-                    // Update harga dasar
-                    basePrice = parseInt(this.getAttribute('data-price'));
-                    updateTotalPrice();
-
-                    // Simpan data ukuran yang dipilih
-                    const selectedSize = this.getAttribute('data-size');
-                    // Anda bisa menggunakan data ini untuk proses selanjutnya
-                });
-            });
-
-            // ukuran default (5000ml)
-            document.querySelector('.size-btn[data-size="5000ml"]').click();
-        });**/
-    </script>
-
-
-
+    <!-- WhatsApp Float Button -->
     <a href="https://wa.me/6289510175754" class="floating-whatsapp">
         <i class="fab fa-whatsapp text-2xl"></i>
     </a>
 
     <!-- JavaScript -->
     <script>
-        /**document.addEventListener('DOMContentLoaded', function () {
-
+        document.addEventListener('DOMContentLoaded', function () {
             // Fungsi modal detail produk
             const detailButtons = document.querySelectorAll('.detail-btn');
             detailButtons.forEach(button => {
@@ -740,37 +607,211 @@ session_start();
                     const productName = productCard.querySelector('h3').textContent;
                     const productPrice = productCard.querySelector('.harga').textContent;
                     const productImage = productCard.querySelector('.product-image').src;
-                    const productIdClass = document.querySelector('.product_id');
-                    const productNameClass = document.querySelector('.product_name');
-                    const productPriceClass = document.querySelector('.product_price');
-                    //const productDescriptionClass = document.querySelector('.product_description');
-                    const productImageClass = document.querySelector('.product_image');
+                    const productCategory = productCard.dataset.category;
                     const productDescription = productCard.dataset.description;
 
-                    // Isi input hidden
-                    productIdClass.value = productId;
-                    productNameClass.value = productName;
-                    let cleaned = productPrice.replace('Rp.', '').trim(); // hapus 'Rp' dan spasi
+                    // Set input hidden
+                    document.querySelector('.product_id').value = productId;
+                    document.querySelector('.product_name').value = productName;
+                    let cleanedPrice = productPrice.replace(/[^\d]/g, '');
+                    document.querySelector('.product_price').value = cleanedPrice;
+                    document.querySelector('.product_image').value = productImage;
+                    document.querySelector('.product_quantity').value = 1;
 
-                    productPriceClass.value = cleaned;
-                    //#f3e8ffproductPriceClass.value = productPrice;
-                    productImageClass.value = productImage;
                     // Isi modal
                     document.getElementById('productModalLabel').textContent = productName;
                     document.querySelector('.modal-image').src = productImage;
                     document.querySelector('.modal-description').innerHTML = `<p>${productDescription}</p>`;
-                    document.querySelector('.modal-price').textContent = productPrice;
 
+                    // Set WhatsApp link
                     const whatsappLink = `https://wa.me/6289510175754?text=Saya%20tertarik%20dengan%20produk%20${encodeURIComponent(productName)}%20dengan%20harga%20${encodeURIComponent(productPrice)}.%20Apakah%20produk%20ini%20tersedia?`;
                     document.querySelector('.buy-btn').href = whatsappLink;
 
                     // Tampilkan modal
                     const modal = new bootstrap.Modal(document.getElementById('productModal'));
                     modal.show();
+
+                    // Handle size options based on category
+                    const sizeOptionsContainer = document.querySelector('.size-options');
+                    sizeOptionsContainer.innerHTML = ''; // Clear previous options
+
+                    if (productCategory === '1') { // Bibit Parfume
+                        sizeOptionsContainer.innerHTML = `
+                        <h4 class="font-medium text-gray-900">Pilih Ukuran:</h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors" 
+                                    data-size="100ml" data-price="${parseInt(cleanedPrice) * 0.5}">
+                                100ml
+                            </button>
+                            <button class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors" 
+                                    data-size="500ml" data-price="${parseInt(cleanedPrice) * 0.8}">
+                                500ml
+                            </button>
+                            <button class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors" 
+                                    data-size="1000ml" data-price="${cleanedPrice}">
+                                1000ml
+                            </button>
+                            <button class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors" 
+                                    data-size="5000ml" data-price="${parseInt(cleanedPrice) * 4.5}">
+                                5000ml
+                            </button>
+                        </div>
+                    `;
+                    } else if (productCategory === '2') { // Botol Parfume
+                        sizeOptionsContainer.innerHTML = `
+                        <h4 class="font-medium text-gray-900">Pilih Ukuran:</h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors" 
+                                    data-size="12 Lusin" data-price="${parseInt(cleanedPrice) * 12}">
+                                12 Lusin
+                            </button>
+                            <button class="size-btn border border-gray-300 rounded-lg py-2 px-4 hover:border-blue-500 hover:text-blue-600 transition-colors" 
+                                    data-size="1 Karton" data-price="${parseInt(cleanedPrice) * 24}">
+                                1 Karton
+                            </button>
+                        </div>
+                    `;
+                    }
+                    // Untuk kategori 3 (Paket Usaha) tidak menampilkan opsi ukuran
+
+                    // Initialize price and quantity
+                    let currentQuantity = 1;
+                    const quantityInput = document.querySelector('.quantity-input');
+                    const priceElement = document.querySelector('.modal-price');
+                    const productPriceInput = document.querySelector('.product_price');
+                    const productQuantityInput = document.querySelector('.product_quantity');
+
+                    // function updateTotalPrice() {
+                    //     productQuantityInput.value = quantityInput.value;
+
+                    //     // Jika ada tombol ukuran yang aktif (kategori 1 atau 2)
+                    //     const activeSizeBtn = document.querySelector('.size-btn.border-blue-500');
+                    //     if (activeSizeBtn) {
+                    //         const basePrice = parseInt(activeSizeBtn.getAttribute('data-price'));
+                    //         const totalPrice = basePrice * quantityInput.value;
+                    //         productPriceInput.value = totalPrice;
+                    //         priceElement.textContent = 'Rp. ' + totalPrice.toLocaleString('id-ID');
+                    //     } else {
+                    //         // Untuk kategori tanpa ukuran (paket usaha)
+                    //         const totalPrice = parseInt(cleanedPrice) * quantityInput.value;
+                    //         productPriceInput.value = totalPrice;
+                    //         priceElement.textContent = 'Rp. ' + totalPrice.toLocaleString('id-ID');
+                    //     }
+                    // }
+
+                    function updateTotalPrice() {
+                        productQuantityInput.value = quantityInput.value;
+
+                        let selectedSize = '';
+                        let totalPrice = 0;
+
+                        // Jika ada tombol ukuran yang aktif
+                        const activeSizeBtn = document.querySelector('.size-btn.border-blue-500');
+                        if (activeSizeBtn) {
+                            const basePrice = parseInt(activeSizeBtn.getAttribute('data-price'));
+                            selectedSize = activeSizeBtn.getAttribute('data-size');
+                            totalPrice = basePrice * quantityInput.value;
+
+                            // ✅ Set nilai input hidden ukuran
+                            document.querySelector('.product_size').value = selectedSize;
+                        } else {
+                            totalPrice = parseInt(cleanedPrice) * quantityInput.value;
+                        }
+
+                        // Update harga & input tersembunyi
+                        productPriceInput.value = totalPrice;
+                        priceElement.textContent = 'Rp. ' + totalPrice.toLocaleString('id-ID');
+
+                        // Update size
+                        document.querySelector('.product_size').value = selectedSize;
+
+
+                        // Update WhatsApp link
+                        const productNameText = document.getElementById('productModalLabel').textContent;
+                        const quantity = quantityInput.value;
+
+                        let message = `Halo, saya tertarik dengan produk berikut:\n`;
+                        message += `Nama: ${productNameText}\n`;
+                        if (selectedSize) message += `Ukuran: ${selectedSize}\n`;
+                        message += `Jumlah: ${quantity}\n`;
+                        message += `Total Harga: Rp ${totalPrice.toLocaleString('id-ID')}\n`;
+                        message += `Apakah produk ini tersedia?`;
+
+                        const whatsappNumber = "6289510175754"; // Ganti sesuai nomor WA-mu
+                        const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+                        document.querySelector('.buy-btn').href = whatsappLink;
+                    }
+
+
+                    // Set initial price
+                    quantityInput.value = currentQuantity;
+                    updateTotalPrice();
+
+                    // Quantity minus
+                    document.querySelectorAll('.qty-minus').forEach(btn => {
+                        btn.onclick = function () {
+                            if (currentQuantity > 1) {
+                                currentQuantity--;
+                                quantityInput.value = currentQuantity;
+                                updateTotalPrice();
+                            }
+                        };
+                    });
+
+                    // Quantity plus
+                    document.querySelectorAll('.qty-plus').forEach(btn => {
+                        btn.onclick = function () {
+                            currentQuantity++;
+                            quantityInput.value = currentQuantity;
+                            updateTotalPrice();
+                        };
+                    });
+
+                    // Manual input quantity
+                    quantityInput.onchange = function () {
+                        const newValue = parseInt(this.value);
+                        if (!isNaN(newValue) && newValue >= 1) {
+                            currentQuantity = newValue;
+                            updateTotalPrice();
+                        } else {
+                            this.value = currentQuantity;
+                        }
+                    };
+
+                    // Size selection (only for categories 1 and 2)
+                    if (productCategory === '1' || productCategory === '2') {
+                        // Set default selected size
+                        setTimeout(() => {
+                            const defaultSizeBtn = productCategory === '1'
+                                ? document.querySelector('.size-btn[data-size="1000ml"]')
+                                : document.querySelector('.size-btn[data-size="12 Lusin"]');
+
+                            if (defaultSizeBtn) {
+                                defaultSizeBtn.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
+                                defaultSizeBtn.classList.remove('border-gray-300');
+                                updateTotalPrice();
+                            }
+                        }, 100);
+
+                        // Handle size button clicks
+                        document.addEventListener('click', function (e) {
+                            if (e.target.classList.contains('size-btn')) {
+                                e.preventDefault();
+                                document.querySelectorAll('.size-btn').forEach(btn => {
+                                    btn.classList.remove('border-blue-500', 'text-blue-600', 'bg-blue-50');
+                                    btn.classList.add('border-gray-300');
+                                });
+                                e.target.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
+                                e.target.classList.remove('border-gray-300');
+                                updateTotalPrice();
+                            }
+                        });
+                    }
                 });
             });
 
-            // fungsi pencarian/search
+            // Fungsi pencarian
             const searchInput = document.getElementById('cari-list');
             searchInput.addEventListener('keyup', function () {
                 const searchTerm = this.value.toLowerCase();
@@ -787,140 +828,7 @@ session_start();
                     }
                 });
             });
-        });**/
-    document.addEventListener('DOMContentLoaded', function () {
-        // Fungsi modal detail produk
-        const detailButtons = document.querySelectorAll('.detail-btn');
-        detailButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                const productCard = this.closest('.product-card');
-                const productId = productCard.querySelector('input').value;
-                const productName = productCard.querySelector('h3').textContent;
-                const productPrice = productCard.querySelector('.harga').textContent;
-                const productImage = productCard.querySelector('.product-image').src;
-                const productIdClass = document.querySelector('.product_id');
-                const productNameClass = document.querySelector('.product_name');
-                const productPriceClass = document.querySelector('.product_price');
-                const productImageClass = document.querySelector('.product_image');
-                const productDescription = productCard.dataset.description;
-
-                // Isi input hidden
-                productIdClass.value = productId;
-                productNameClass.value = productName;
-                let cleaned = productPrice.replace(/[^\d]/g, '');
-                productPriceClass.value = cleaned;
-                productImageClass.value = productImage;
-
-                // Isi modal
-                document.getElementById('productModalLabel').textContent = productName;
-                document.querySelector('.modal-image').src = productImage;
-                document.querySelector('.modal-description').innerHTML = `<p>${productDescription}</p>`;
-                //document.querySelector('.modal-price').textContent = productPrice;
-
-                const whatsappLink = `https://wa.me/6289510175754?text=Saya%20tertarik%20dengan%20produk%20${encodeURIComponent(productName)}%20dengan%20harga%20${encodeURIComponent(productPrice)}.%20Apakah%20produk%20ini%20tersedia?`;
-                document.querySelector('.buy-btn').href = whatsappLink;
-
-                // Tampilkan modal
-                const modal = new bootstrap.Modal(document.getElementById('productModal'));
-                modal.show();
-
-                // Bagian Harga dan Quantity
-                let currentQuantity = 1;
-                const quantityInput = document.querySelector('.quantity-input');
-                const priceElement = document.querySelector('.modal-price');
-                //const productPriceRow = productCard.querySelector('.harga').textContent;
-                const productPriceInput = document.querySelector('.product_price');
-                const productQuantityInput = document.querySelector('.product_quantity');
-
-                function updateTotalPrice() {
-                    productQuantityInput.value = quantityInput.value;
-                    priceElement.textContent = productPrice;
-                    let cleaned = parseInt(productPrice.replace(/[^\d]/g, ''), 10);
-                    const totalPrice = cleaned * quantityInput.value;
-                    productPriceInput.value = totalPrice;
-                    priceElement.textContent = 'Rp. ' + totalPrice.toLocaleString('id-ID');
-                }
-
-                // Set ulang quantity ke 1
-                quantityInput.value = currentQuantity;
-                updateTotalPrice();
-
-                // Quantity minus
-                document.querySelectorAll('.qty-minus').forEach(btn => {
-                    btn.onclick = function () {
-                        if (currentQuantity > 1) {
-                            currentQuantity--;
-                            quantityInput.value = currentQuantity;
-                            updateTotalPrice();
-                        }
-                    };
-                });
-
-                // Quantity plus
-                document.querySelectorAll('.qty-plus').forEach(btn => {
-                    btn.onclick = function () {
-                        currentQuantity++;
-                        quantityInput.value = currentQuantity;
-                        updateTotalPrice();
-                    };
-                });
-
-                // Manual input quantity
-                quantityInput.onchange = function () {
-                    const newValue = parseInt(this.value);
-                    if (!isNaN(newValue) && newValue >= 1) {
-                        currentQuantity = newValue;
-                        updateTotalPrice();
-                    } else {
-                        this.value = currentQuantity;
-                    }
-                };
-
-                // Size selection
-                const sizeButtons = document.querySelectorAll('.size-btn');
-                sizeButtons.forEach(btn => {
-                    btn.onclick = function () {
-                        sizeButtons.forEach(b => {
-                            b.classList.remove('border-blue-500', 'text-blue-600', 'bg-blue-50');
-                            b.classList.add('border-gray-300');
-                        });
-
-                        this.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
-                        this.classList.remove('border-gray-300');
-
-                        const basePrice = parseInt(this.getAttribute('data-price'));
-                        const totalPrice = basePrice * currentQuantity;
-                        //priceElement.textContent = 'Rp' + totalPrice.toLocaleString('id-ID');
-                        productPriceInput.value = totalPrice;
-                    };
-                });
-
-                // Trigger default size
-                document.querySelector('.size-btn[data-size="5000ml"]').click();
-            });
         });
-
-        // fungsi pencarian/search
-        const searchInput = document.getElementById('cari-list');
-        searchInput.addEventListener('keyup', function () {
-            const searchTerm = this.value.toLowerCase();
-            const productItems = document.querySelectorAll('.product-item');
-
-            productItems.forEach(item => {
-                const name = item.getAttribute('data-name').toLowerCase();
-                const description = item.getAttribute('data-description').toLowerCase();
-
-                if (name.includes(searchTerm) || description.includes(searchTerm)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    });
-
     </script>
 
     <!-- Bootstrap JS -->
