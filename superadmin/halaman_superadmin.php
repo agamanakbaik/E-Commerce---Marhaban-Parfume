@@ -18,7 +18,7 @@ if (!isset($_SESSION['superadmin'])) {
         <h1 class="text-xl font-bold text-[#099ea3]">Super Admin Dashboard</h1>
         <div>
             <span class="text-gray-600 mr-4">Halo, <?= htmlspecialchars($_SESSION['superadmin']) ?></span>
-            <a href="logout.php" class="text-red-500 hover:underline">Logout</a>
+            <a href="logout_superadmin.php" class="text-red-500 hover:underline">Logout</a>
         </div>
     </nav>
 

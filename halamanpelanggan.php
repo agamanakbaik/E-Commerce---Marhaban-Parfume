@@ -229,7 +229,7 @@ if (!isset($_SESSION['pelanggan'])) {
     <?php endif; ?>
 
     <!-- Navbar -->
-    <nav class="bg-white shadow-md py-4 px-6 lg:px-12">
+    <nav class="bg-white shadow-md py-4 px-6 sticky top-0 z-50 lg:px-12">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center">
                 <a href="#" class="navbar-brand flex items-center">
@@ -247,13 +247,13 @@ if (!isset($_SESSION['pelanggan'])) {
 
                     <div id="dropdownMenu"
                         class="absolute left-0 hidden bg-white shadow-lg rounded-md mt-2 py-2 w-48 z-10">
-                        <a href="index.php" class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Semua
+                        <a href="halamanpelanggan.php" class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Semua
                             Kategori</a>
-                        <a href="index.php?category_id=1"
+                        <a href="halamanpelanggan.php?category_id=1"
                             class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Bibit Parfume</a>
-                        <a href="index.php?category_id=2"
+                        <a href="halamanpelanggan.php?category_id=2"
                             class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Botol Parfume</a>
-                        <a href="index.php?category_id=3"
+                        <a href="halamanpelanggan.php?category_id=3"
                             class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Paket Usaha</a>
                     </div>
                 </div>
@@ -695,7 +695,7 @@ if (!isset($_SESSION['pelanggan'])) {
                     //         // Untuk kategori tanpa ukuran (paket usaha)
                     //         const totalPrice = parseInt(cleanedPrice) * quantityInput.value;
                     //         productPriceInput.value = totalPrice;
-                    //         priceElement.textContent = 'Rp. ' + totalPrice.toLocaleString('id-ID');
+                    //         priceElement.textContent = 'R . ' + totalPrice.toLocaleString('id-ID');
                     //     }
                     // }
 

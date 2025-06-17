@@ -29,13 +29,15 @@ if (isset($_GET['error']) && $_GET['error'] === '1') {
             <p class="text-sm text-gray-500">Panel khusus untuk administrator</p>
         </div>
 
+        <!--alert gagal login-->
         <?php if ($showError): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm text-center">
                 <strong>Login gagal!</strong> Username atau password salah.
             </div>
         <?php endif; ?>
 
-        <form action="login_proses_admin.php" method="post" class="space-y-4">
+        <!-- proses login -->
+        <form action="login_proses.php" method="post" class="space-y-4">
             <div>
                 <label class="block text-gray-700 text-sm font-medium mb-1">Username</label>
                 <input type="text" name="username" required
@@ -55,6 +57,7 @@ if (isset($_GET['error']) && $_GET['error'] === '1') {
         </form>
     </div>
 
+    <!-- menghilangkan alert 4 detik -->
     <script>
         setTimeout(() => {
             const alert = document.querySelector('.bg-red-100');

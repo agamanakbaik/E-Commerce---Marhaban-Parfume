@@ -58,18 +58,18 @@ if (isset($_GET['register']) && $_GET['register'] === 'success') {
             <div>
                 <label class="block text-gray-700 text-sm font-medium mb-1">Email</label>
                 <input type="email" name="email" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600" />
             </div>
 
             <div>
                 <label class="block text-gray-700 text-sm font-medium mb-1">Password</label>
                 <input type="password" name="password" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600" />
             </div>
 
             <div class="flex items-center justify-between text-sm">
                 <label class="flex items-center gap-2 text-gray-600">
-                    <input type="checkbox" name="remember" class="accent-purple-500">
+                    <input type="checkbox" name="remember" class="accent-teal-500">
                     Ingat Saya
                 </label>
                 <a href="lupa_password.php" class="text-[#099ea3] hover:underline">Lupa Password?</a>

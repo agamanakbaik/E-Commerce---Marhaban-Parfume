@@ -121,78 +121,87 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
 
         .about-section,
         .order-section {
-            background: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%);
-            color: white;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: #1f2937;
+            /* Tailwind gray-800 */
         }
 
-        .modal-content {
-            border-radius: 1rem;
-            overflow: hidden;
-        }
+        .order-section .step-box:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-4px);
 
-        .modal-image {
-            max-height: 400px;
-            object-fit: cover;
-            width: 100%;
-            border-radius: 0.5rem;
-        }
+            .order-section .step-box {
+                background-color: #ffffff;
+                border: 1px solid #e5e7eb;
+                transition: background-color 0.3s, transform 0.3s;
 
-        .buy-btn {
-            background-color: rgb(37, 99, 235);
-            color: white;
-            transition: all 0.3s ease;
-        }
+                .modal-content {
+                    border-radius: 1rem;
+                    overflow: hidden;
+                }
 
-        .buy-btn:hover {
-            background-color: rgb(31, 92, 184);
-            color: white;
-        }
+                .modal-image {
+                    max-height: 400px;
+                    object-fit: cover;
+                    width: 100%;
+                    border-radius: 0.5rem;
+                }
 
-        .cart-icon {
-            position: relative;
-        }
+                .buy-btn {
+                    background-color: rgb(37, 99, 235);
+                    color: white;
+                    transition: all 0.3s ease;
+                }
 
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: #ef4444;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+                .buy-btn:hover {
+                    background-color: rgb(31, 92, 184);
+                    color: white;
+                }
 
-        .floating-whatsapp {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background-color: #25D366;
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
+                .cart-icon {
+                    position: relative;
+                }
 
-        .floating-whatsapp:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-        }
+                .cart-count {
+                    position: absolute;
+                    top: -8px;
+                    right: -8px;
+                    background-color: #ef4444;
+                    color: white;
+                    border-radius: 50%;
+                    width: 18px;
+                    height: 18px;
+                    font-size: 0.7rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .floating-whatsapp {
+                    position: fixed;
+                    bottom: 30px;
+                    right: 30px;
+                    background-color: #25D366;
+                    color: white;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    z-index: 1000;
+                    transition: all 0.3s ease;
+                }
+
+                .floating-whatsapp:hover {
+                    transform: scale(1.1);
+                    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+                }
     </style>
 </head>
 
 <body>
-
     <!-- Alert Message -->
     <?php if (isset($_SESSION['message'])): ?>
         <div id="alert-box"
@@ -221,7 +230,7 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
     <?php endif; ?>
 
     <!-- Navbar -->
-    <nav class="bg-white shadow-md py-4 px-6 lg:px-12">
+    <nav class="bg-white shadow-md py-4 px-6 lg:px-12 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center">
                 <a href="#" class="navbar-brand flex items-center">
@@ -277,11 +286,18 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
                 </a>
 
 
-                <!-- Login & Registrasi -->
+                <!-- Login  & Registrasi -->
                 <a href="loginpelanggan.php"
                     class="text-sm font-medium text-gray-700 hover:text-[#099ea3] transition">Login</a>
                 <a href="registrasi_pelanggan.php"
                     class="ml-2 text-sm font-medium text-white bg-[#099ea3] hover:bg-[#077c7f] px-4 py-1.5 rounded transition">Registrasi</a>
+
+                <!-- Ikon search di navbar -->
+                <button onclick="scrollToSearch()" class="ml-4 text-gray-400 hover:text-[#099ea3] transition text-lg">
+                    <i class="fas fa-search"></i>
+                </button>
+
+
             </div>
         </div>
     </nav>
@@ -316,15 +332,21 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
                 <br>Jam Operasional: Senin - Sabtu 08:30-17:00
             </p>
         </div>
+        <!-- pencarian -->
+        <div id="sesi-list" class="flex justify-end mb-8">
+    <div class="relative w-full md:w-1/3 max-w-md">
+        <input type="text" id="cari-list" placeholder="Cari produk..."
+            class="search-box w-full pl-10 pr-5 py-3 focus:outline-none text-gray-800 hover:text-black-700   focus:ring-1 focus:ring-[#077c7f] rounded-lg border border-gray-300">
 
-        <div class="flex justify-end mb-8">
-            <div class="relative w-full md:w-1/3 max-w-md">
-                <input type="text" id="cari-list" placeholder="Cari produk..."
-                    class="search-box w-full pl-10 pr-5 py-3 focus:outline-none border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-200 rounded-lg">
-                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
-                <span id="search-count" class="absolute right-3 top-3.5 text-gray-500 text-sm hidden"></span>
-            </div>
-        </div>
+        <!-- ikon pencarian bisa di klik dan posisinya rapi -->
+        <button onclick="document.getElementById('cari-list').focus()"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#077c7f]">
+            <i class="fas fa-search text-base"></i>
+        </button>
+
+        <span id="search-count" class="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm hidden"></span>
+    </div>
+</div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="product-container">
             <?php
@@ -379,55 +401,57 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
     </section>
 
     <!-- About Section -->
-    <section id="tentangkami" class="about-section py-16 px-6 lg:px-12">
+    <section id="tentangkami" class="about-section py-8 px-6 lg:px-12">
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col lg:flex-row items-center">
                 <div class="lg:w-1/2 mb-8 lg:mb-0 lg:pr-12">
-                    <h2 class="section-title text-3xl font-bold text-white mb-6">Tentang Kami</h2>
-                    <p class="text-white mb-6">
+                    <h2 class="section-title text-3xl font-bold mb-4">Tentang Kami</h2>
+                    <p class="mb-4 leading-relaxed">
                         Marhaban Perfume telah berkarya sejak tahun 2017 dan didirikan oleh Bapak Syarif Salim Bahanan.
                         Kami menyediakan berbagai jenis parfum berkualitas dan melayani pengiriman ke seluruh Indonesia.
                     </p>
-                    <p class="text-white">
-                        <i class="fas fa-map-marker-alt mr-2"></i> Jl. Empang No.31B, Empang, Kota Bogor, Jawa Barat
-                        16132
+                    <p class="flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        Jl. Empang No.31B, Empang, Kota Bogor, Jawa Barat 16132
                     </p>
                 </div>
                 <div class="lg:w-1/2">
-                    <img src="images/about-us.png" alt="About Us" class="rounded-lg shadow-xl w-full">
+                    <img src="images/about-us.png" alt="About Us"
+                        class="rounded-lg shadow-xl w-full max-h-72 object-contain">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Order Section -->
-    <section id="caraorder" class="order-section py-16 px-6 lg:px-12">
+    <section id="caraorder" class="order-section py-8 px-6 lg:px-12">
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col lg:flex-row items-center">
                 <div class="lg:w-1/2 mb-8 lg:mb-0 lg:order-1 lg:pl-12 order-2">
-                    <h2 class="section-title text-3xl font-bold text-white mb-6">Cara Order</h2>
-                    <p class="text-white mb-6">
+                    <h2 class="section-title text-3xl font-bold mb-4">Cara Order</h2>
+                    <p class="mb-4 leading-relaxed">
                         Pilih produk yang diinginkan, lalu klik menu Detail. Jika hanya membeli satu produk, klik tombol
                         <span class="font-semibold">Beli Produk Ini</span>. Namun jika ingin membeli lebih dari satu
                         produk, masukkan ke keranjang terlebih dahulu.
                     </p>
-                    <div class="flex space-x-4">
-                        <div class="bg-white bg-opacity-20 p-4 rounded-lg flex-1">
-                            <i class="fas fa-search text-2xl mb-2"></i>
-                            <h3 class="font-semibold">1. Cari Produk</h3>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="step-box p-4 rounded-lg text-center flex-1 shadow">
+                            <i class="fas fa-search text-2xl mb-2 text-indigo-600"></i>
+                            <h3 class="font-semibold text-sm">1. Cari Produk</h3>
                         </div>
-                        <div class="bg-white bg-opacity-20 p-4 rounded-lg flex-1">
-                            <i class="fas fa-cart-plus text-2xl mb-2"></i>
-                            <h3 class="font-semibold">2. Tambah ke Keranjang</h3>
+                        <div class="step-box p-4 rounded-lg text-center flex-1 shadow">
+                            <i class="fas fa-cart-plus text-2xl mb-2 text-indigo-600"></i>
+                            <h3 class="font-semibold text-sm">2. Tambah ke Keranjang</h3>
                         </div>
-                        <div class="bg-white bg-opacity-20 p-4 rounded-lg flex-1">
-                            <i class="fas fa-check-circle text-2xl mb-2"></i>
-                            <h3 class="font-semibold">3. Checkout</h3>
+                        <div class="step-box p-4 rounded-lg text-center flex-1 shadow">
+                            <i class="fas fa-check-circle text-2xl mb-2 text-indigo-600"></i>
+                            <h3 class="font-semibold text-sm">3. Checkout</h3>
                         </div>
                     </div>
                 </div>
                 <div class="lg:w-1/2 lg:order-2 order-1">
-                    <img src="images/order.png" alt="Order Process" class="rounded-lg shadow-xl w-full">
+                    <img src="images/order.png" alt="Order Process"
+                        class="rounded-lg shadow-xl w-full max-h-72 object-contain">
                 </div>
             </div>
         </div>
@@ -445,33 +469,38 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
                     <h3 class="text-xl font-bold mb-4">Kontak Kami</h3>
                     <ul class="space-y-2">
                         <li class="flex items-center">
-                            <i class="fas fa-phone-alt mr-2 text-purple-400"></i>
+                            <i class="fas fa-phone-alt mr-2 text-green-400"></i>
                             <span>+62 895-1017-5754</span>
                         </li>
                         <li class="flex items-center">
-                            <i class="fas fa-envelope mr-2 text-purple-400"></i>
+                            <i class="fas fa-envelope mr-2 text-white-400"></i>
                             <span>info@marhabanparfume.com</span>
                         </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-map-marker-alt mr-2 text-purple-400"></i>
-                            <span>Jl. Empang No.31B, Bogor</span>
-                        </li>
+
+                        <a href="https://www.google.com/maps/place/Marhaban+Parfum/@-6.606362,106.7926423,17z/data=!3m1!4b1!4m6!3m5!1s0x2e69c5d18c750557:0x8c2366fb253444ed!8m2!3d-6.606362!4d106.7952172!16s%2Fg%2F11mg9qzsd8?entry=ttu&g_ep=EgoyMDI1MDYxMS4wIKXMDSoASAFQAw%3D%3D"
+                            target="_blank" class="block">
+                            <li class="flex items-center hover:underline text-white">
+                                <i class="fas fa-map-marker-alt mr-2 text-red-400"></i>
+                                <span>Jl. Empang No.31B, Bogor</span>
+                            </li>
+                        </a>
+
                     </ul>
                 </div>
                 <div>
                     <h3 class="text-xl font-bold mb-4">Ikuti Kami</h3>
                     <div class="flex space-x-4">
-                        <a href="#"
-                            class="bg-purple-700 w-10 h-10 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
-                            <i class="fab fa-facebook-f"></i>
+                        <a href="https://web.facebook.com/marhabanperfumeofficial" target="blank"
+                            class="bg-[#1877F2] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#155FCB] transition">
+                            <i class="fab fa-facebook-f text-white"></i>
                         </a>
-                        <a href="#"
-                            class="bg-purple-700 w-10 h-10 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
-                            <i class="fab fa-instagram"></i>
+                        <a target="_blank" href="https://www.instagram.com/marhabanparfum?utm_source=ig_web_button_share_sheet&igsh=MXBkYzMyNzliMWZlYw=="
+                            class="bg-[#E1306C] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#C72E65] transition">
+                            <i class="fab fa-instagram text-white"></i>
                         </a>
-                        <a href="#"
-                            class="bg-purple-700 w-10 h-10 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
-                            <i class="fab fa-whatsapp"></i>
+                        <a href="https://wa.me/6289510175754" target="_blank"
+                            class="bg-[#25D366] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#1DA851] transition">
+                            <i class="fab fa-whatsapp text-white"></i>
                         </a>
                     </div>
                 </div>
@@ -481,6 +510,8 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
             </div>
         </div>
     </footer>
+
+
 
     <!--produk modal -->
     <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto bg-black bg-opacity-50"
@@ -869,6 +900,24 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
             });
         }); 
     </script>
+
+
+    <script>
+        //ketika  logo search di tekan, nge redirect ke cari produk
+        function scrollToSearch() {
+            const target = document.getElementById('sesi-list');
+            const input = document.getElementById('cari-list');
+
+            if (target && input) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => input.focus(), 500); // beri jeda agar fokus setelah scroll
+            }
+        }
+
+        
+    </script>
+
+
 </body>
 
 </html>
