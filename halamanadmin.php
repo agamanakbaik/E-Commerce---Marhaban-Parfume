@@ -442,13 +442,58 @@ header("Expires: 0");
 
 
         <!-- Footer -->
-        <footer class="bg-dark text-white py-4">
-            <div class="container">
-                <div class="text-center">
-                    <p class="mb-0">&copy; 2025 Marhaban Perfume. - Pusat Grosir Parfume Berkualitas</p>
+    <footer class="bg-gray-900 text-white py-8 px-6 lg:px-12">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Marhaban Parfume</h3>
+                    <p class="text-gray-400">Pusat Grosir Parfume Berkualitas sejak 2017</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Kontak Kami</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-phone-alt mr-2 text-green-400"></i>
+                            <span>+62 895-1017-5754</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-white-400"></i>
+                            <span>info@marhabanparfume.com</span>
+                        </li>
+
+                        <a href="https://www.google.com/maps/place/Marhaban+Parfum/@-6.606362,106.7926423,17z/data=!3m1!4b1!4m6!3m5!1s0x2e69c5d18c750557:0x8c2366fb253444ed!8m2!3d-6.606362!4d106.7952172!16s%2Fg%2F11mg9qzsd8?entry=ttu&g_ep=EgoyMDI1MDYxMS4wIKXMDSoASAFQAw%3D%3D"
+                            target="_blank" class="block">
+                            <li class="flex items-center hover:underline text-white">
+                                <i class="fas fa-map-marker-alt mr-2 text-red-400"></i>
+                                <span>Jl. Empang No.31B, Bogor</span>
+                            </li>
+                        </a>
+
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Ikuti Kami</h3>
+                    <div class="flex space-x-4">
+                        <a href="https://web.facebook.com/marhabanperfumeofficial" target="blank"
+                            class="bg-[#1877F2] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#155FCB] transition">
+                            <i class="fab fa-facebook-f text-white"></i>
+                        </a>
+                        <a target="_blank" href="https://www.instagram.com/marhabanparfum?utm_source=ig_web_button_share_sheet&igsh=MXBkYzMyNzliMWZlYw=="
+                            class="bg-[#E1306C] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#C72E65] transition">
+                            <i class="fab fa-instagram text-white"></i>
+                        </a>
+                        <a href="https://wa.me/6289510175754" target="_blank"
+                            class="bg-[#25D366] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#1DA851] transition">
+                            <i class="fab fa-whatsapp text-white"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </footer>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Marhaban Perfume. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
     </div>
 
     <!-- Modal Tambah Produk -->
