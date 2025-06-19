@@ -14,7 +14,7 @@ if (!isset($_SESSION['pelanggan'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Marhaban Parfume - Pusat Grosir Parfume Berkualitas</title>
 
-      <!-- Bootstrap CSS menu dropdown logout dan aku saya-->
+    <!-- Bootstrap CSS menu dropdown logout dan aku saya-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Font Awesome -->
@@ -124,8 +124,9 @@ if (!isset($_SESSION['pelanggan'])) {
 
         .about-section,
         .order-section {
-            background: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%);
-            color: white;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: #1f2937;
+            /* Tailwind gray-800 */
         }
 
         .modal-content {
@@ -229,7 +230,7 @@ if (!isset($_SESSION['pelanggan'])) {
     <?php endif; ?>
 
     <!-- Navbar -->
-    <nav class="bg-white shadow-md py-4 px-6 sticky top-0 z-50 lg:px-12">
+    <nav class="bg-white shadow-md py-2 px-6 sticky top-0 z-50 lg:px-12">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center">
                 <a href="#" class="navbar-brand flex items-center">
@@ -247,7 +248,8 @@ if (!isset($_SESSION['pelanggan'])) {
 
                     <div id="dropdownMenu"
                         class="absolute left-0 hidden bg-white shadow-lg rounded-md mt-2 py-2 w-48 z-10">
-                        <a href="halamanpelanggan.php" class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Semua
+                        <a href="halamanpelanggan.php"
+                            class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Semua
                             Kategori</a>
                         <a href="halamanpelanggan.php?category_id=1"
                             class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Bibit Parfume</a>
@@ -279,28 +281,38 @@ if (!isset($_SESSION['pelanggan'])) {
                 <a href="#tentangkami" class="nav-link">Tentang Kami</a>
                 <a href="#caraorder" class="nav-link">Cara Order</a>
 
-                <a href="keranjang.php" class="nav-link cart-icon">
+                <a href="keranjang.php" class="flex items-center space-x-1 text-gray-700 hover:text-gray-900">
                     <i class="fas fa-shopping-cart text-xl"></i>
-                    <span class="cart-count">0</span>
+                    <span class="text-base font-semibold">0</span>
                 </a>
 
-                <!-- dropdown menu logout -->
+
+                <!-- buat ngatur profil -->
                     <div class="btn-group">
-                        <button type="button" class="btn btn-danger" data-bs-toggle="dropdown" aria-expanded="false"
-                            style="background-color: #fff; border: #fff; color: #212529; margin-bottom: 7px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-baseline-density-medium">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M4 20h16" />
-                                <path d="M4 12h16" />
-                                <path d="M4 4h16" />
-                            </svg>
+                        <button type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            class="w-10 h-10 transition duration-200" style="margin-bottom: 7px;">
+                            <img src="images/profil/profil_default.png" alt="Profil"
+                                class="w-10 h-10 object-cover rounded-full">
+
+
                         </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Akun Saya</a></li>
-                            <li><a class="dropdown-item" href="logout_pelanggan.php">Logout</a></li>
+                        <!-- dropdown menu -->
+                        <ul class="dropdown-menu shadow-lg rounded-lg overflow-hidden">
+                            <li class="hover:bg-gray-100 transition-colors duration-200">
+                                <a class="dropdown-item flex items-center gap-2 py-2 px-3 hover:bg-gray-50"
+                                    href="akun_pelanggan.php">
+                                    <img src="images/profil/profil_default.png" alt="Profil"
+                                        class="w-10 h-10 object-contain rounded-full">
+
+                                    <span>Akun Saya</span>
+                                </a>
+                            </li>
+                            <li class="hover:bg-gray-100 transition-colors duration-200">
+                                <a class="dropdown-item py-2 px-3 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                    href="logout.php">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            </li>
                         </ul>
                     </div>
             </div>
@@ -338,12 +350,20 @@ if (!isset($_SESSION['pelanggan'])) {
             </p>
         </div>
 
-        <div class="flex justify-end mb-8">
+        <!-- pencarian -->
+        <div id="sesi-list" class="flex justify-end mb-8">
             <div class="relative w-full md:w-1/3 max-w-md">
                 <input type="text" id="cari-list" placeholder="Cari produk..."
-                    class="search-box w-full pl-10 pr-5 py-3 focus:outline-none border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-200 rounded-lg">
-                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
-                <span id="search-count" class="absolute right-3 top-3.5 text-gray-500 text-sm hidden"></span>
+                    class="search-box w-full pl-10 pr-5 py-3 focus:outline-none text-gray-800 hover:text-black-700   focus:ring-1 focus:ring-[#077c7f] rounded-lg border border-gray-300">
+
+                <!-- ikon pencarian bisa di klik dan posisinya rapi -->
+                <button onclick="document.getElementById('cari-list').focus()"
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#077c7f]">
+                    <i class="fas fa-search text-base"></i>
+                </button>
+
+                <span id="search-count"
+                    class="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm hidden"></span>
             </div>
         </div>
 
@@ -400,59 +420,62 @@ if (!isset($_SESSION['pelanggan'])) {
     </section>
 
     <!-- About Section -->
-    <section id="tentangkami" class="about-section py-16 px-6 lg:px-12">
+    <section id="tentangkami" class="about-section py-8 px-6 lg:px-12">
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col lg:flex-row items-center">
                 <div class="lg:w-1/2 mb-8 lg:mb-0 lg:pr-12">
-                    <h2 class="section-title text-3xl font-bold text-white mb-6">Tentang Kami</h2>
-                    <p class="text-white mb-6">
+                    <h2 class="section-title text-3xl font-bold mb-4">Tentang Kami</h2>
+                    <p class="mb-4 leading-relaxed">
                         Marhaban Perfume telah berkarya sejak tahun 2017 dan didirikan oleh Bapak Syarif Salim Bahanan.
                         Kami menyediakan berbagai jenis parfum berkualitas dan melayani pengiriman ke seluruh Indonesia.
                     </p>
-                    <p class="text-white">
-                        <i class="fas fa-map-marker-alt mr-2"></i> Jl. Empang No.31B, Empang, Kota Bogor, Jawa Barat
-                        16132
+                    <p class="flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        Jl. Empang No.31B, Empang, Kota Bogor, Jawa Barat 16132
                     </p>
                 </div>
                 <div class="lg:w-1/2">
-                    <img src="images/about-us.png" alt="About Us" class="rounded-lg shadow-xl w-full">
+                    <img src="images/about-us.png" alt="About Us"
+                        class="rounded-lg shadow-xl w-full max-h-72 object-contain">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Order Section -->
-    <section id="caraorder" class="order-section py-16 px-6 lg:px-12">
+    <section id="caraorder" class="order-section py-8 px-6 lg:px-12">
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col lg:flex-row items-center">
                 <div class="lg:w-1/2 mb-8 lg:mb-0 lg:order-1 lg:pl-12 order-2">
-                    <h2 class="section-title text-3xl font-bold text-white mb-6">Cara Order</h2>
-                    <p class="text-white mb-6">
+                    <h2 class="section-title text-3xl font-bold mb-4">Cara Order</h2>
+                    <p class="mb-4 leading-relaxed">
                         Pilih produk yang diinginkan, lalu klik menu Detail. Jika hanya membeli satu produk, klik tombol
                         <span class="font-semibold">Beli Produk Ini</span>. Namun jika ingin membeli lebih dari satu
                         produk, masukkan ke keranjang terlebih dahulu.
                     </p>
-                    <div class="flex space-x-4">
-                        <div class="bg-white bg-opacity-20 p-4 rounded-lg flex-1">
-                            <i class="fas fa-search text-2xl mb-2"></i>
-                            <h3 class="font-semibold">1. Cari Produk</h3>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="step-box p-4 rounded-lg text-center flex-1 shadow">
+                            <i class="fas fa-search text-2xl mb-2 text-indigo-600"></i>
+                            <h3 class="font-semibold text-sm">1. Cari Produk</h3>
                         </div>
-                        <div class="bg-white bg-opacity-20 p-4 rounded-lg flex-1">
-                            <i class="fas fa-cart-plus text-2xl mb-2"></i>
-                            <h3 class="font-semibold">2. Tambah ke Keranjang</h3>
+                        <div class="step-box p-4 rounded-lg text-center flex-1 shadow">
+                            <i class="fas fa-cart-plus text-2xl mb-2 text-indigo-600"></i>
+                            <h3 class="font-semibold text-sm">2. Tambah ke Keranjang</h3>
                         </div>
-                        <div class="bg-white bg-opacity-20 p-4 rounded-lg flex-1">
-                            <i class="fas fa-check-circle text-2xl mb-2"></i>
-                            <h3 class="font-semibold">3. Checkout</h3>
+                        <div class="step-box p-4 rounded-lg text-center flex-1 shadow">
+                            <i class="fas fa-check-circle text-2xl mb-2 text-indigo-600"></i>
+                            <h3 class="font-semibold text-sm">3. Checkout</h3>
                         </div>
                     </div>
                 </div>
                 <div class="lg:w-1/2 lg:order-2 order-1">
-                    <img src="images/order.png" alt="Order Process" class="rounded-lg shadow-xl w-full">
+                    <img src="images/order.png" alt="Order Process"
+                        class="rounded-lg shadow-xl w-full max-h-72 object-contain">
                 </div>
             </div>
         </div>
     </section>
+
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-8 px-6 lg:px-12">

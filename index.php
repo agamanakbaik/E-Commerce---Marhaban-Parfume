@@ -334,19 +334,20 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
         </div>
         <!-- pencarian -->
         <div id="sesi-list" class="flex justify-end mb-8">
-    <div class="relative w-full md:w-1/3 max-w-md">
-        <input type="text" id="cari-list" placeholder="Cari produk..."
-            class="search-box w-full pl-10 pr-5 py-3 focus:outline-none text-gray-800 hover:text-black-700   focus:ring-1 focus:ring-[#077c7f] rounded-lg border border-gray-300">
+            <div class="relative w-full md:w-1/3 max-w-md">
+                <input type="text" id="cari-list" placeholder="Cari produk..."
+                    class="search-box w-full pl-10 pr-5 py-3 focus:outline-none text-gray-800 hover:text-black-700   focus:ring-1 focus:ring-[#077c7f] rounded-lg border border-gray-300">
 
-        <!-- ikon pencarian bisa di klik dan posisinya rapi -->
-        <button onclick="document.getElementById('cari-list').focus()"
-            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#077c7f]">
-            <i class="fas fa-search text-base"></i>
-        </button>
+                <!-- ikon pencarian bisa di klik dan posisinya rapi -->
+                <button onclick="document.getElementById('cari-list').focus()"
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#077c7f]">
+                    <i class="fas fa-search text-base"></i>
+                </button>
 
-        <span id="search-count" class="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm hidden"></span>
-    </div>
-</div>
+                <span id="search-count"
+                    class="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm hidden"></span>
+            </div>
+        </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="product-container">
             <?php
@@ -494,7 +495,8 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
                             class="bg-[#1877F2] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#155FCB] transition">
                             <i class="fab fa-facebook-f text-white"></i>
                         </a>
-                        <a target="_blank" href="https://www.instagram.com/marhabanparfum?utm_source=ig_web_button_share_sheet&igsh=MXBkYzMyNzliMWZlYw=="
+                        <a target="_blank"
+                            href="https://www.instagram.com/marhabanparfum?utm_source=ig_web_button_share_sheet&igsh=MXBkYzMyNzliMWZlYw=="
                             class="bg-[#E1306C] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#C72E65] transition">
                             <i class="fab fa-instagram text-white"></i>
                         </a>
@@ -914,7 +916,7 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
             }
         }
 
-        
+
     </script>
 
 

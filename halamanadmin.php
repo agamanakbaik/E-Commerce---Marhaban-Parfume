@@ -1,16 +1,21 @@
 <?php
 session_start();
+require 'db.php';
 
-//Cek apakah admin sudah login
 if (!isset($_SESSION['admin'])) {
-    header("Location: login.php");
+    header('Location: login.php');
     exit;
 }
-//Cegah browser menyimpan cache halaman admin
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Pragma: no-cache");
-header("Expires: 0");
+
+$admin_username = mysqli_real_escape_string($conn, $_SESSION['admin']);
+$result = mysqli_query($conn, "SELECT foto FROM admin WHERE username='$admin_username'");
+$row = mysqli_fetch_assoc($result);
+
+$admin_foto = $row && $row['foto']
+    ? 'images/profil/' . $row['foto']
+    : 'images/profil/profil_default.png';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -215,7 +220,7 @@ header("Expires: 0");
     <div class="container-fluid px-0">
 
         <!-- navbar -->
-        <nav class="bg-white shadow-md py-4 px-6 sticky top-0 z-50 lg:px-12">
+        <nav class="bg-white shadow-md py-2 px-6 sticky top-0 z-50 lg:px-12">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center">
                     <a href="#" class="navbar-brand flex items-center hover:text-gray-800">
@@ -286,26 +291,37 @@ header("Expires: 0");
                         </button>
                     </div>
 
-                    <!-- dropdown menu logout -->
+                    <!-- buat ngatur profil -->
                     <div class="btn-group">
-                        <button type="button" class="btn btn-danger" data-bs-toggle="dropdown" aria-expanded="false"
-                            style="background-color: #fff; border: #fff; color: #212529; margin-bottom: 7px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-baseline-density-medium">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M4 20h16" />
-                                <path d="M4 12h16" />
-                                <path d="M4 4h16" />
-                            </svg>
+                        <button type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            class="w-10 h-10 transition duration-200" style="margin-bottom: 7px;">
+                            <img src="<?= htmlspecialchars($admin_foto) ?>" alt="Profil"
+                                class="w-10 h-10 object-cover rounded-full">
+
+
                         </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Akun Saya</a></li>
-                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                        <!-- dropdown menu -->
+                        <ul class="dropdown-menu shadow-lg rounded-lg overflow-hidden">
+                            <li class="hover:bg-gray-100 transition-colors duration-200">
+                                <a class="dropdown-item flex items-center gap-2 py-2 px-3 hover:bg-gray-50"
+                                    href="akun_admin.php">
+                                    <img src="<?= htmlspecialchars($admin_foto) ?>" alt="Profil"
+                                        class="w-10 h-10 object-contain rounded-full">
+
+                                    <span>Akun Saya</span>
+                                </a>
+                            </li>
+                            <li class="hover:bg-gray-100 transition-colors duration-200">
+                                <a class="dropdown-item py-2 px-3 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                    href="logout.php">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            </li>
                         </ul>
                     </div>
-                </div>
+                </div> 
+            </div>    
+
         </nav>
 
         <!-- Main Content/konten utama -->
@@ -417,7 +433,7 @@ header("Expires: 0");
         <br>
 
         <!-- About us / tentang  kami -->
-    <!-- <section id="tentangkami" class="about-section py-8 px-6 lg:px-12">
+        <!-- <section id="tentangkami" class="about-section py-8 px-6 lg:px-12">
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col lg:flex-row items-center">
                 <div class="lg:w-1/2 mb-8 lg:mb-0 lg:pr-12">
@@ -442,58 +458,59 @@ header("Expires: 0");
 
 
         <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8 px-6 lg:px-12">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <h3 class="text-xl font-bold mb-4">Marhaban Parfume</h3>
-                    <p class="text-gray-400">Pusat Grosir Parfume Berkualitas sejak 2017</p>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold mb-4">Kontak Kami</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-center">
-                            <i class="fas fa-phone-alt mr-2 text-green-400"></i>
-                            <span>+62 895-1017-5754</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-envelope mr-2 text-white-400"></i>
-                            <span>info@marhabanparfume.com</span>
-                        </li>
-
-                        <a href="https://www.google.com/maps/place/Marhaban+Parfum/@-6.606362,106.7926423,17z/data=!3m1!4b1!4m6!3m5!1s0x2e69c5d18c750557:0x8c2366fb253444ed!8m2!3d-6.606362!4d106.7952172!16s%2Fg%2F11mg9qzsd8?entry=ttu&g_ep=EgoyMDI1MDYxMS4wIKXMDSoASAFQAw%3D%3D"
-                            target="_blank" class="block">
-                            <li class="flex items-center hover:underline text-white">
-                                <i class="fas fa-map-marker-alt mr-2 text-red-400"></i>
-                                <span>Jl. Empang No.31B, Bogor</span>
+        <footer class="bg-gray-900 text-white py-8 px-6 lg:px-12">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Marhaban Parfume</h3>
+                        <p class="text-gray-400">Pusat Grosir Parfume Berkualitas sejak 2017</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Kontak Kami</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-phone-alt mr-2 text-green-400"></i>
+                                <span>+62 895-1017-5754</span>
                             </li>
-                        </a>
+                            <li class="flex items-center">
+                                <i class="fas fa-envelope mr-2 text-white-400"></i>
+                                <span>info@marhabanparfume.com</span>
+                            </li>
 
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold mb-4">Ikuti Kami</h3>
-                    <div class="flex space-x-4">
-                        <a href="https://web.facebook.com/marhabanperfumeofficial" target="blank"
-                            class="bg-[#1877F2] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#155FCB] transition">
-                            <i class="fab fa-facebook-f text-white"></i>
-                        </a>
-                        <a target="_blank" href="https://www.instagram.com/marhabanparfum?utm_source=ig_web_button_share_sheet&igsh=MXBkYzMyNzliMWZlYw=="
-                            class="bg-[#E1306C] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#C72E65] transition">
-                            <i class="fab fa-instagram text-white"></i>
-                        </a>
-                        <a href="https://wa.me/6289510175754" target="_blank"
-                            class="bg-[#25D366] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#1DA851] transition">
-                            <i class="fab fa-whatsapp text-white"></i>
-                        </a>
+                            <a href="https://www.google.com/maps/place/Marhaban+Parfum/@-6.606362,106.7926423,17z/data=!3m1!4b1!4m6!3m5!1s0x2e69c5d18c750557:0x8c2366fb253444ed!8m2!3d-6.606362!4d106.7952172!16s%2Fg%2F11mg9qzsd8?entry=ttu&g_ep=EgoyMDI1MDYxMS4wIKXMDSoASAFQAw%3D%3D"
+                                target="_blank" class="block">
+                                <li class="flex items-center hover:underline text-white">
+                                    <i class="fas fa-map-marker-alt mr-2 text-red-400"></i>
+                                    <span>Jl. Empang No.31B, Bogor</span>
+                                </li>
+                            </a>
+
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Ikuti Kami</h3>
+                        <div class="flex space-x-4">
+                            <a href="https://web.facebook.com/marhabanperfumeofficial" target="blank"
+                                class="bg-[#1877F2] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#155FCB] transition">
+                                <i class="fab fa-facebook-f text-white"></i>
+                            </a>
+                            <a target="_blank"
+                                href="https://www.instagram.com/marhabanparfum?utm_source=ig_web_button_share_sheet&igsh=MXBkYzMyNzliMWZlYw=="
+                                class="bg-[#E1306C] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#C72E65] transition">
+                                <i class="fab fa-instagram text-white"></i>
+                            </a>
+                            <a href="https://wa.me/6289510175754" target="_blank"
+                                class="bg-[#25D366] w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#1DA851] transition">
+                                <i class="fab fa-whatsapp text-white"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
+                <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                    <p>&copy; 2025 Marhaban Perfume. All rights reserved.</p>
+                </div>
             </div>
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2025 Marhaban Perfume. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+        </footer>
     </div>
 
     <!-- Modal Tambah Produk -->
@@ -749,7 +766,7 @@ header("Expires: 0");
             input.focus();
             scrollToTombol();
         }
-         //trigger scroll juga saat user mulai ngetik
+        //trigger scroll juga saat user mulai ngetik
         document.getElementById('cari-list').addEventListener('input', scrollToTombol);
 
     </script>

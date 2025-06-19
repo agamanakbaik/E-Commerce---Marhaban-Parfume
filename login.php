@@ -41,13 +41,13 @@ if (isset($_GET['error']) && $_GET['error'] === '1') {
             <div>
                 <label class="block text-gray-700 text-sm font-medium mb-1">Username</label>
                 <input type="text" name="username" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600" />
             </div>
 
             <div>
                 <label class="block text-gray-700 text-sm font-medium mb-1">Password</label>
                 <input type="password" name="password" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600" />
             </div>
 
             <div>
