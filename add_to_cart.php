@@ -13,25 +13,22 @@ if (isset($_POST['add_to_cart'])) {
     $product_price = floatval($_POST['product_price']);
     $product_image = htmlspecialchars($_POST['product_image']);
     $product_quantity = intval($_POST['product_quantity']);
-    $product_size = isset($_POST['product_size']) ? htmlspecialchars($_POST['product_size']) : ''; // Ambil ukuran
+    $product_size = isset($_POST['product_size']) ? htmlspecialchars($_POST['product_size']) : 'Standard'; // Default jika tidak ada ukuran
 
     // Validasi harga
-    if ($product_price < 0) {
+    if ($product_price <= 0) {
         die("Harga produk tidak valid");
     }
 
     // Item lengkap dengan ukuran
-    $product_size = htmlspecialchars($_POST['product_size'] ?? ''); // bisa 100ml, 5000ml, dll
-
-$item = [
-    'id' => $product_id,
-    'name' => $product_name,
-    'price' => $product_price,
-    'image' => $product_image,
-    'quantity' => $product_quantity,
-    'size' => $product_size
-];
-
+    $item = [
+        'id' => $product_id,
+        'name' => $product_name,
+        'price' => $product_price,
+        'image' => $product_image,
+        'quantity' => $product_quantity,
+        'size' => $product_size
+    ];
 
     // Inisialisasi keranjang
     if (!isset($_SESSION['cart'])) {
@@ -61,4 +58,3 @@ $item = [
     header("Location: halamanpelanggan.php");
     exit();
 }
-?>
