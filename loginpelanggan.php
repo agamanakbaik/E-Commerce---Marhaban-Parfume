@@ -12,10 +12,12 @@ if (isset($_COOKIE['remember_me'])) {
     if ($row = $result->fetch_assoc()) {
         $_SESSION['pelanggan'] = true;
         $_SESSION['pelanggan_id'] = $row['id'];
+        $_SESSION['pelanggan_email'] = $row['email']; // ✅ Tambahkan ini
         header("Location: halamanpelanggan.php");
         exit;
     }
 }
+
 
 //jika ada yang berhasil registrasi
 $showSuccess = false;

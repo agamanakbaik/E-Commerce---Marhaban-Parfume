@@ -1,19 +1,35 @@
 <?php
 session_start();
-require '../db.php'; // Sesuaikan path ke koneksi database
+require '../db.php';
 
-// Contoh: tombol backup database
-if (isset($_GET['backup']) && $_GET['backup'] == '1') {
+$_SESSION['superadmin'] = true;
+
+
+// Proteksi hanya untuk superadmin
+if (!isset($_SESSION['superadmin']) || $_SESSION['superadmin'] !== true) {
+    die("Akses ditolak. Hanya superadmin yang dapat melakukan backup.");
+}
+
+// Proses backup jika tombol diklik
+if (isset($_GET['backup']) && $_GET['backup'] == 1) {
     $nama_file = "backup_" . date("Y-m-d_H-i-s") . ".sql";
     header("Content-Disposition: attachment; filename=$nama_file");
     header("Content-Type: application/sql");
 
-    // Command untuk mysqldump (kamu harus pastikan mysqldump tersedia di server)
-    // Jangan gunakan ini di shared hosting kecuali dengan izin
-    system("mysqldump -u root -p your_db_name");
+    // Konfigurasi koneksi database
+    $host = "localhost";
+    $user = "root";
+    $pass = ""; // sesuaikan
+    $db   = "marhaban"; // ganti nama database
+
+    // Jalankan mysqldump
+    system("mysqldump -h $host -u $user " . ($pass ? "-p$pass " : "") . "$db");
+
     exit;
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -41,7 +57,7 @@ if (isset($_GET['backup']) && $_GET['backup'] == '1') {
         </div>
 
         <!-- Section: Reset Data -->
-        <div>
+        <!-- <div>
             <h2 class="text-lg font-semibold mb-2">Reset Data</h2>
             <form method="post" onsubmit="return confirm('Yakin ingin menghapus semua data pesanan?');">
                 <button type="submit" name="reset_pesanan"
@@ -49,14 +65,14 @@ if (isset($_GET['backup']) && $_GET['backup'] == '1') {
                     Hapus Semua Pesanan
                 </button>
             </form>
-        </div>
+        </div> -->
 
         <!-- Section: Pengaturan Sistem -->
-        <div>
+        <!-- <div>
             <h2 class="text-lg font-semibold mb-2">Pengaturan Sistem</h2>
             <p class="text-sm text-gray-600">Fitur ini bisa kamu kembangkan lebih lanjut, misalnya untuk mengatur nama
                 toko, email notifikasi, dsb.</p>
-        </div>
+        </div> -->
         <!-- Section: Pengaturan Toko -->
         <div>
             <h2 class="text-lg font-semibold mb-2">Pengaturan Toko</h2>

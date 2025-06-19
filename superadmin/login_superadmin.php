@@ -23,7 +23,7 @@ if (isset($_GET['error']) && $_GET['error'] === '1') {
 
     <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md border border-purple-200">
         <div class="text-center mb-6">
-            <img src="./images/logo.png" alt="Logo" class="h-16 mx-auto mb-2">
+            <img src="../images/logo.png" alt="Logo" class="h-16 mx-auto mb-2">
             <h2 class="text-2xl font-bold text-gray-800">Login Super Admin</h2>
             <p class="text-sm text-gray-500">Panel kontrol utama Marhaban Parfume</p>
         </div>

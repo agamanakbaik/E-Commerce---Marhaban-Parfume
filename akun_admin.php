@@ -95,11 +95,11 @@ $jp = countByCat(3);
 
     <div class="space-y-3">
       <button id="openModalBtn"
-              class="w-full bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600">
+              class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
         Edit Profil
       </button>
       <a href="halamanadmin.php"
-         class="block w-full text-center bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+         class="block w-full text-center bg-green-500 text-white py-2 rounded hover:bg-green-600">
         Kelola Produk
       </a>
       <a href="logout.php"

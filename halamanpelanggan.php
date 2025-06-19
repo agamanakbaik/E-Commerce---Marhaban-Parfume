@@ -4,6 +4,24 @@ if (!isset($_SESSION['pelanggan'])) {
     header("Location: loginpelanggan.php");
     exit;
 }
+
+require 'db.php'; // Pastikan koneksi ada
+
+$id = $_SESSION['pelanggan_id']; // Pastikan ini sudah di-set saat login
+$default_foto = 'profil_default.png';
+
+// Ambil data pelanggan dari database
+$stmt = mysqli_prepare($conn, "SELECT foto FROM pelanggan WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$data = mysqli_fetch_assoc($result);
+
+// Tentukan path foto
+$foto = (!empty($data['foto']) && file_exists('images/profil/' . $data['foto']))
+    ? 'images/profil/' . $data['foto']
+    : 'images/profil/' . $default_foto;
+
 ?>
 
 <!DOCTYPE html>
@@ -249,14 +267,14 @@ if (!isset($_SESSION['pelanggan'])) {
                     <div id="dropdownMenu"
                         class="absolute left-0 hidden bg-white shadow-lg rounded-md mt-2 py-2 w-48 z-10">
                         <a href="halamanpelanggan.php"
-                            class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Semua
+                            class="block px-4 py-2 hover:text-[#099ea3] text-gray-700 transition">Semua
                             Kategori</a>
                         <a href="halamanpelanggan.php?category_id=1"
-                            class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Bibit Parfume</a>
+                            class="block px-4 py-2 hover:text-[#099ea3] text-gray-700 transition">Bibit Parfume</a>
                         <a href="halamanpelanggan.php?category_id=2"
-                            class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Botol Parfume</a>
+                            class="block px-4 py-2 hover:text-[#099ea3] text-gray-700 transition">Botol Parfume</a>
                         <a href="halamanpelanggan.php?category_id=3"
-                            class="block px-4 py-2 hover:bg-purple-100 text-gray-700 transition">Paket Usaha</a>
+                            class="block px-4 py-2 hover:text-[#099ea3] text-gray-700 transition">Paket Usaha</a>
                     </div>
                 </div>
 
@@ -291,7 +309,7 @@ if (!isset($_SESSION['pelanggan'])) {
                     <div class="btn-group">
                         <button type="button" data-bs-toggle="dropdown" aria-expanded="false"
                             class="w-10 h-10 transition duration-200" style="margin-bottom: 7px;">
-                            <img src="images/profil/profil_default.png" alt="Profil"
+                            <img src="<?= htmlspecialchars($foto) ?>" alt="Profil"
                                 class="w-10 h-10 object-cover rounded-full">
 
 
@@ -301,7 +319,7 @@ if (!isset($_SESSION['pelanggan'])) {
                             <li class="hover:bg-gray-100 transition-colors duration-200">
                                 <a class="dropdown-item flex items-center gap-2 py-2 px-3 hover:bg-gray-50"
                                     href="akun_pelanggan.php">
-                                    <img src="images/profil/profil_default.png" alt="Profil"
+                                    <img src="<?= htmlspecialchars($foto) ?>" alt="Profil"
                                         class="w-10 h-10 object-contain rounded-full">
 
                                     <span>Akun Saya</span>
@@ -309,7 +327,7 @@ if (!isset($_SESSION['pelanggan'])) {
                             </li>
                             <li class="hover:bg-gray-100 transition-colors duration-200">
                                 <a class="dropdown-item py-2 px-3 text-red-600 hover:text-red-800 hover:bg-red-50"
-                                    href="logout.php">
+                                    href="logout_pelanggan.php">
                                     <i class="fas fa-sign-out-alt mr-2"></i>Logout
                                 </a>
                             </li>

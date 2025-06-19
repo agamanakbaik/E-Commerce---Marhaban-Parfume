@@ -23,6 +23,10 @@ $admin_foto = $row && $row['foto']
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin Dashboard - Marhaban Parfume</title>
+    
+    <!-- SweetAlert2 CDN allert yakin ingin menghapus produk? -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -432,29 +436,6 @@ $admin_foto = $row && $row['foto']
         </div>
         <br>
 
-        <!-- About us / tentang  kami -->
-        <!-- <section id="tentangkami" class="about-section py-8 px-6 lg:px-12">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex flex-col lg:flex-row items-center">
-                <div class="lg:w-1/2 mb-8 lg:mb-0 lg:pr-12">
-                    <h2 class="section-title text-3xl font-bold mb-4">Tentang Kami</h2>
-                    <p class="mb-4 leading-relaxed">
-                        Marhaban Perfume telah berkarya sejak tahun 2017 dan didirikan oleh Bapak Syarif Salim Bahanan.
-                        Kami menyediakan berbagai jenis parfum berkualitas dan melayani pengiriman ke seluruh Indonesia.
-                    </p>
-                    <p class="flex items-center">
-                        <i class="fas fa-map-marker-alt mr-2"></i>
-                        Jl. Empang No.31B, Empang, Kota Bogor, Jawa Barat 16132
-                    </p>
-                </div>
-                <div class="lg:w-1/2">
-                    <img src="images/about-us.png" alt="About Us"
-                        class="rounded-lg shadow-xl w-full max-h-72 object-contain">
-                </div>
-            </div>
-        </div>
-    </section> -->
-
 
 
         <!-- Footer -->
@@ -711,33 +692,74 @@ $admin_foto = $row && $row['foto']
                 });
             });
 
-            // Delete Product Confirmation
-            $('.btnDelete').click(function (e) {
-                e.preventDefault();
 
-                if (!confirm("Yakin ingin menghapus produk ini?")) {
-                    return;
-                }
+            // hapus produk
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.querySelectorAll('.btnDelete').forEach(button => {
+                button.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const card = this.closest('.product-item');
 
-                const productId = $(this).data('id');
-
-                $.ajax({
-                    url: 'delete_product.php',
-                    type: 'POST',
-                    data: { id: productId },
-                    success: function (response) {
-                        if (response.trim() === 'success') {
-                            alert("Produk berhasil dihapus.");
-                            location.reload();
-                        } else {
-                            alert("Gagal menghapus: " + response);
-                        }
-                    },
-                    error: function () {
-                        alert("Terjadi kesalahan saat menghapus.");
+                Swal.fire({
+                    title: 'Yakin ingin menghapus produk ini?',
+                    text: 'Tindakan ini tidak bisa dibatalkan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e3342f',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                fetch('delete_product.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: 'id=' + encodeURIComponent(id)
+                            })
+                                .then(res => res.json())
+                                .then(data => {
+                            if (data.success) {
+                                card.remove(); // Hapus dari tampilan
+                                Swal.fire('Berhasil!', 'Produk telah dihapus.', 'success');
+                            } else {
+                                Swal.fire('Gagal!', data.message || 'Tidak bisa menghapus produk.', 'error');
+                            }   
+                        })
+                            .catch(() => {
+                            Swal.fire('Error!', 'Terjadi kesalahan saat menghubungi server.', 'error');
+                         });
                     }
                 });
             });
+        });
+     </script>
+
+
+            // Delete Product Confirmation
+//     document.querySelectorAll('.btnDelete').forEach(button => {
+//     button.addEventListener('click', function (e) {
+//         e.preventDefault();
+//         const id = this.getAttribute('data-id');
+
+//         Swal.fire({
+//             title: 'Yakin ingin menghapus?',
+//             text: 'Tindakan ini tidak dapat dibatalkan!',
+//             icon: 'warning',
+//             showCancelButton: true,
+//             confirmButtonColor: '#e3342f',
+//             cancelButtonColor: '#6c757d',
+//             confirmButtonText: 'Ya, hapus!',
+//             cancelButtonText: 'Batal'
+//         }).then((result) => {
+//             if (result.isConfirmed) {
+//                 window.location.href = 'delete_product.php?id=' + id;
+//             }
+//         });
+//     });
+// });
+
+
 
             // Edit Product Modal Handler
             $('.btnEdit').click(function () {

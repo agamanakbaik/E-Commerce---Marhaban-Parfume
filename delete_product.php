@@ -1,5 +1,6 @@
 <?php
 include 'db.php';
+header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'] ?? null;
@@ -9,16 +10,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("i", $id);
 
         if ($stmt->execute()) {
-            echo "success";
+            echo json_encode(['success' => true]);
         } else {
-            echo "delete_failed";
+            echo json_encode(['success' => false, 'message' => 'Gagal menghapus dari database.']);
         }
 
         $stmt->close();
     } else {
-        echo "invalid_id";
+        echo json_encode(['success' => false, 'message' => 'ID tidak valid.']);
     }
 } else {
-    echo "invalid_method";
+    echo json_encode(['success' => false, 'message' => 'Metode tidak diperbolehkan.']);
 }
-?>
