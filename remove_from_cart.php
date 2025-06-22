@@ -1,15 +1,17 @@
 <?php
 session_start();
+header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $productId = intval($_POST['id']);
-    $productSize = $_POST['size'] ?? '';
+    $variantId = isset($_POST['variant_id']) ? intval($_POST['variant_id']) : 0;
 
     if (isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = array_filter($_SESSION['cart'], function ($item) use ($productId, $productSize) {
-            return !($item['id'] == $productId && $item['size'] == $productSize);
+        $_SESSION['cart'] = array_filter($_SESSION['cart'], function ($item) use ($productId, $variantId) {
+            return !($item['id'] == $productId && $item['variant_id'] == $variantId);
         });
-        // Reset array keys
+
+        // Reset indeks array biar urut
         $_SESSION['cart'] = array_values($_SESSION['cart']);
     }
 
@@ -18,3 +20,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 echo json_encode(['success' => false]);
+exit;

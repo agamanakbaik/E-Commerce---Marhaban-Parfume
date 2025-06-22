@@ -1,6 +1,29 @@
-~}|"<?php
+<?php
 session_start();
-$isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
+
+// Hitung total belanja
+$total = 0;
+if (isset($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $item) {
+        $total += $item['price'] * $item['quantity'];
+    }
+}
+
+// Pesan WhatsApp
+$whatsappMessage = "Halo, saya ingin memesan:\n\n";
+if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
+    foreach ($_SESSION['cart'] as $item) {
+        $whatsappMessage .= "- " . $item['name'];
+        // Tampilkan ukuran hanya untuk kategori bibit (id = 1)
+        if (!empty($item['size']) && isset($item['category']) && $item['category'] == '1') {
+            $whatsappMessage .= " (" . $item['size'] . ")";
+        }
+        $whatsappMessage .= " - " . $item['quantity'] . " x Rp " . number_format($item['price'], 0, ',', '.') . "\n";
+    }
+    $whatsappMessage .= "\nTotal: Rp " . number_format($total, 0, ',', '.');
+} else {
+    $whatsappMessage = "Keranjang Anda kosong.";
+}
 ?>
 
 <!DOCTYPE html>
@@ -9,217 +32,288 @@ $isLoggedIn = isset($_SESSION['pelanggan_id']) ? 'true' : 'false';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marhaban Parfume</title>
-
-    <!-- CSS dan Font -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Keranjang Belanja - Marhaban Parfume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .cart-scroll {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .cart-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .cart-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .cart-scroll::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        .cart-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100">
-    <!-- Navbar -->
-    <nav class="bg-white shadow py-4 px-6">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <a href="#" class="flex items-center">
-                <img src="images/logo.png" alt="Logo" class="h-12 w-12 mr-2">
-                <span class="text-xl font-bold">Marhaban Parfume</span>
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="halamanpelanggan.php" class="flex items-center space-x-2">
+                <img src="images/logo.png" alt="Logo" class="h-10 w-10">
+                <h1 class="text-xl font-bold text-gray-800">Marhaban Parfume</h1>
             </a>
-            <div class="flex items-center space-x-6">
-                <a href="#" class="cart-icon relative">
-                    <i class="fas fa-shopping-cart text-2xl"></i>
-                    <span class="cart-count absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">0</span>
+            <div class="flex items-center space-x-4">
+                <a href="halamanpelanggan.php" class="text-gray-600 hover:text-blue-500">
+                    <i class="fas fa-store text-lg"></i>
                 </a>
-                <?php if ($isLoggedIn === 'true'): ?>
-                    <a href="logout.php" class="bg-red-500 text-white px-4 py-2 rounded">Logout</a>
-                <?php else: ?>
-                    <a href="loginpelanggan.php" class="text-gray-700">Login</a>
-                    <a href="registrasi_pelanggan.php" class="bg-blue-500 text-white px-4 py-2 rounded">Daftar</a>
-                <?php endif; ?>
+                <a href="keranjang.php" class="text-gray-600 hover:text-blue-500 relative">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        <?= isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0 ?>
+                    </span>
+                </a>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Produk -->
-    <section class="py-12 px-6">
-        <h2 class="text-3xl font-bold text-center mb-12">Produk Kami</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <?php
-            include 'db.php';
-            $result = mysqli_query($conn, "SELECT * FROM products");
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo '
-                <div class="bg-white rounded-lg shadow overflow-hidden product-card">
-                    <input type="hidden" value="' . $row['id'] . '">
-                    <img src="images/' . $row['image'] . '" alt="' . $row['name'] . '" class="w-full h-64 object-contain">
-                    <div class="p-4">
-                        <h3 class="font-bold text-lg">' . $row['name'] . '</h3>
-                        <p class="text-gray-600 my-2">' . $row['description'] . '</p>
-                        <div class="flex justify-between items-center mt-4">
-                            <span class="text-blue-600 font-bold">Rp ' . number_format($row['price'], 0, ',', '.') . '</span>
-                            <button class="detail-btn bg-blue-500 text-white px-4 py-2 rounded">Detail</button>
-                        </div>
-                    </div>
-                </div>';
-            }
-            ?>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">
+                <i class="fas fa-shopping-cart mr-2"></i> Keranjang Belanja
+            </h2>
+            <?php if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
+                <button id="clearCart" class="text-red-500 hover:text-red-700 flex items-center">
+                    <i class="fas fa-trash mr-2"></i> Kosongkan Keranjang
+                </button>
+            <?php endif; ?>
         </div>
-    </section>
 
-    <!-- Modal Produk -->
-    <div class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg w-11/12 md:w-2/3 lg:w-1/2 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl font-bold product-name"></h3>
-                <button class="close-modal text-2xl">&times;</button>
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Daftar Produk -->
+            <div class="lg:w-2/3">
+                <div id="cartItems" class="bg-white rounded-lg shadow p-4 cart-scroll">
+                    <?php if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
+                        <div class="space-y-4">
+                            <?php foreach ($_SESSION['cart'] as $index => $item):
+                                $image = !empty($item['image']) ? $item['image'] : "images/no-image.jpg";
+                                $itemTotal = $item['price'] * $item['quantity'];
+                            ?>
+                                <div class="cart-item bg-white border border-gray-200 rounded-lg p-4 transition duration-300">
+                                    <div class="flex flex-col md:flex-row gap-4">
+                                        <!-- Gambar Produk -->
+                                        <div class="flex-shrink-0">
+                                            <img src="<?= $image ?>" alt="<?= htmlspecialchars($item['name']) ?>"
+                                                class="w-20 h-20 object-cover rounded-lg">
+                                        </div>
+
+                                        <!-- Detail Produk -->
+                                        <div class="flex-grow">
+                                            <div class="flex justify-between">
+                                                <div>
+                                                    <h3 class="font-semibold text-gray-800"><?= htmlspecialchars($item['name']) ?></h3>
+                                                    <?php if (!empty($item['size']) && isset($item['category']) && $item['category'] == '1'): ?>
+                                                        <p class="text-sm text-gray-500 mt-1">Ukuran: <?= htmlspecialchars($item['size']) ?></p>
+                                                    <?php endif; ?>
+                                                    <p class="text-blue-600 font-semibold mt-2">
+                                                        Rp <?= number_format($item['price'], 0, ',', '.') ?>
+                                                    </p>
+                                                </div>
+                                                <button class="remove-item text-red-500 hover:text-red-700 h-8"
+                                                    data-id="<?= $item['id'] ?>"
+                                                    data-size="<?= htmlspecialchars($item['size'] ?? '') ?>">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Kontrol Kuantitas -->
+                                            <div class="flex items-center justify-between mt-4">
+                                                <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                                                    <button class="quantity-btn minus bg-gray-100 px-3 py-1 hover:bg-gray-200"
+                                                        data-id="<?= $item['id'] ?>"
+                                                        data-size="<?= htmlspecialchars($item['size'] ?? '') ?>">
+                                                        <i class="fas fa-minus text-sm"></i>
+                                                    </button>
+                                                    <span class="quantity bg-white px-4 py-1 text-center w-12">
+                                                        <?= $item['quantity'] ?>
+                                                    </span>
+                                                    <button class="quantity-btn plus bg-gray-100 px-3 py-1 hover:bg-gray-200"
+                                                        data-id="<?= $item['id'] ?>"
+                                                        data-size="<?= htmlspecialchars($item['size'] ?? '') ?>">
+                                                        <i class="fas fa-plus text-sm"></i>
+                                                    </button>
+                                                </div>
+                                                <p class="font-bold text-blue-600">
+                                                    Rp <?= number_format($itemTotal, 0, ',', '.') ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-center py-12">
+                            <i class="fas fa-shopping-basket text-5xl text-gray-300 mb-4"></i>
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">Keranjang Belanja Kosong</h3>
+                            <p class="text-gray-500 mb-6">Belum ada produk di keranjang belanja Anda</p>
+                            <a href="halamanpelanggan.php"
+                                class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                                <i class="fas fa-store-alt mr-2"></i> Lanjutkan Belanja
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-6">
-                <img src="" alt="Produk" class="product-image w-full h-64 object-contain">
-
-                <div>
-                    <p class="product-description text-gray-700 mb-4"></p>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-blue-600 font-bold text-xl product-price"></span>
-                        <div class="flex items-center border rounded">
-                            <button class="qty-minus px-3 py-1 bg-gray-100">-</button>
-                            <input type="number" value="1" min="1" class="w-12 text-center quantity">
-                            <button class="qty-plus px-3 py-1 bg-gray-100">+</button>
+            <!-- Ringkasan Belanja -->
+            <?php if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
+                <div class="lg:w-1/3">
+                    <div class="bg-white rounded-lg shadow p-6 sticky top-4">
+                        <h3 class="font-bold text-lg text-gray-800 mb-4 border-b pb-2">Ringkasan Belanja</h3>
+                        <div class="space-y-3 mb-4">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Barang</span>
+                                <span><?= count($_SESSION['cart']) ?> produk</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Subtotal</span>
+                                <span>Rp <?= number_format($total, 0, ',', '.') ?></span>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="flex space-x-4">
-                        <a href="#" class="whatsapp-btn bg-green-500 text-white px-4 py-2 rounded flex items-center">
-                            <i class="fab fa-whatsapp mr-2"></i> WhatsApp
-                        </a>
-                        <button class="add-to-cart bg-blue-500 text-white px-4 py-2 rounded flex items-center">
-                            <i class="fas fa-cart-plus mr-2"></i> Keranjang
+                        <div class="border-t border-gray-200 pt-3 mb-4">
+                            <div class="flex justify-between font-bold text-lg">
+                                <span>Total</span>
+                                <span class="text-blue-600">Rp <?= number_format($total, 0, ',', '.') ?></span>
+                            </div>
+                        </div>
+                        <button id="checkoutBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300">
+                            <i class="fab fa-whatsapp mr-2 text-xl"></i> Pesan via WhatsApp
                         </button>
                     </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
-    </div>
+    </main>
 
-    <!-- WhatsApp Float -->
-    <a href="https://wa.me/6289510175754" class="fixed bottom-8 right-8 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <!-- JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const isLoggedIn = <?= $isLoggedIn ?>;
-            let currentProduct = {};
-
-            // Buka modal produk
-            document.querySelectorAll('.detail-btn').forEach(btn => {
+            // Tombol quantity
+            document.querySelectorAll('.quantity-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const card = this.closest('.product-card');
-                    currentProduct = {
-                        id: card.querySelector('input').value,
-                        name: card.querySelector('h3').textContent,
-                        price: card.querySelector('span').textContent.replace(/\D/g, ''),
-                        description: card.querySelector('p').textContent,
-                        image: card.querySelector('img').src
-                    };
+                    const productId = this.getAttribute('data-id');
+                    const productSize = this.getAttribute('data-size');
+                    const isMinus = this.classList.contains('minus');
 
-                    // Isi data modal
-                    document.querySelector('.product-name').textContent = currentProduct.name;
-                    document.querySelector('.product-description').textContent = currentProduct.description;
-                    document.querySelector('.product-price').textContent = 'Rp ' + parseInt(currentProduct.price).toLocaleString('id-ID');
-                    document.querySelector('.product-image').src = currentProduct.image;
-                    document.querySelector('.quantity').value = 1;
-
-                    // Update link WhatsApp
-                    const waLink = `https://wa.me/6289510175754?text=Saya%20mau%20pesan%20${encodeURIComponent(currentProduct.name)}%20sebanyak%201%20pcs`;
-                    document.querySelector('.whatsapp-btn').href = waLink;
-
-                    // Tampilkan modal
-                    document.querySelector('.modal').classList.remove('hidden');
+                    fetch('update_cart.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `id=${productId}&size=${encodeURIComponent(productSize)}&action=${isMinus ? 'decrease' : 'increase'}`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload();
+                            }
+                        });
                 });
             });
 
-            // Tutup modal
-            document.querySelector('.close-modal').addEventListener('click', function() {
-                document.querySelector('.modal').classList.add('hidden');
-            });
+            // Hapus item
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-id');
+                    const productSize = this.getAttribute('data-size');
 
-            // Quantity +/-
-            document.querySelector('.qty-minus').addEventListener('click', function() {
-                const qtyInput = document.querySelector('.quantity');
-                if (qtyInput.value > 1) qtyInput.value--;
-                updateTotal();
-            });
-
-            document.querySelector('.qty-plus').addEventListener('click', function() {
-                const qtyInput = document.querySelector('.quantity');
-                qtyInput.value++;
-                updateTotal();
-            });
-
-            document.querySelector('.quantity').addEventListener('change', function() {
-                if (this.value < 1) this.value = 1;
-                updateTotal();
-            });
-
-            function updateTotal() {
-                const quantity = document.querySelector('.quantity').value;
-                const total = currentProduct.price * quantity;
-                document.querySelector('.product-price').textContent = 'Rp ' + total.toLocaleString('id-ID');
-
-                // Update WA link
-                const waLink = `https://wa.me/6289510175754?text=Saya%20mau%20pesan%20${encodeURIComponent(currentProduct.name)}%20sebanyak%20${quantity}%20pcs`;
-                document.querySelector('.whatsapp-btn').href = waLink;
-            }
-
-            // Tambah ke keranjang
-            document.querySelector('.add-to-cart').addEventListener('click', function() {
-                if (!isLoggedIn) {
                     Swal.fire({
+                        title: 'Hapus Produk?',
+                        text: "Produk akan dihapus dari keranjang",
                         icon: 'warning',
-                        title: 'Login Diperlukan',
-                        text: 'Silakan login terlebih dahulu'
-                    });
-                    return;
-                }
-
-                const quantity = document.querySelector('.quantity').value;
-
-                // Kirim data ke server (simplified)
-                fetch('add_to_cart.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            product_id: currentProduct.id,
-                            quantity: quantity
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Update counter keranjang
-                            const cartCount = document.querySelector('.cart-count');
-                            cartCount.textContent = parseInt(cartCount.textContent) + parseInt(quantity);
-
-                            // Tampilkan notifikasi
-                            Swal.fire({
-                                position: 'top-end',
-                                icon: 'success',
-                                title: quantity + ' ' + currentProduct.name + ' ditambahkan',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-
-                            // Tutup modal
-                            document.querySelector('.modal').classList.add('hidden');
-                        } else {
-                            Swal.fire('Error', data.message, 'error');
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Hapus',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch('remove_from_cart.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                    },
+                                    body: `id=${productId}&size=${encodeURIComponent(productSize)}`
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        location.reload();
+                                    }
+                                });
                         }
                     });
+                });
+            });
+
+            // Kosongkan keranjang
+            document.getElementById('clearCart')?.addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Kosongkan Keranjang?',
+                    text: "Semua produk akan dihapus dari keranjang",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Kosongkan',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('clear_cart.php', {
+                                method: 'POST'
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    location.reload();
+                                }
+                            });
+                    }
+                });
+            });
+
+            // Checkout WhatsApp
+            document.getElementById('checkoutBtn')?.addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Lanjutkan ke WhatsApp?',
+                    text: "Pesanan akan dikirim via WhatsApp",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#25D366',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Lanjutkan',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const waMessage = `<?= rawurlencode($whatsappMessage) ?>`;
+                        const waNumber = "6289510175754";
+                        window.location.href = `https://wa.me/${waNumber}?text=${waMessage}`;
+
+                        // Kosongkan keranjang setelah checkout
+                        fetch('clear_cart.php', {
+                            method: 'POST'
+                        });
+                    }
+                });
             });
         });
     </script>

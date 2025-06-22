@@ -8,16 +8,18 @@ if (!isset($_SESSION['admin'])) {
 }
 
 $admin_username = mysqli_real_escape_string($conn, $_SESSION['admin']);
-$result = mysqli_query($conn, "SELECT foto FROM admin WHERE username='$admin_username'");
-$row = mysqli_fetch_assoc($result);
+$admin_foto = 'images/profil/profil_default.png'; // Gunakan foto default
 
-$admin_foto = $row && $row['foto']
-    ? 'images/profil/' . $row['foto']
-    : 'images/profil/profil_default.png';
+// Ambil varian untuk ditampilkan di modal edit
+$variantMap = [];
+$variantResult = mysqli_query($conn, "SELECT * FROM product_variants");
+while ($v = mysqli_fetch_assoc($variantResult)) {
+    $variantMap[$v['product_id']][] = $v;
+}
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8">
@@ -210,12 +212,6 @@ $admin_foto = $row && $row['foto']
 
 <body>
 
-
-    <script>
-        var isLoggedIn = <?= json_encode($loggedIn) ?>; // Kirim status login ke JavaScript
-    </script>
-    <!-- <script src="main.js"></script> Hubungkan file JS -->
-
     <!-- Main Container/pembungkus utama -->
     <div class="container-fluid px-0">
 
@@ -265,7 +261,7 @@ $admin_foto = $row && $row['foto']
                         }
 
                         // Optional: klik luar nutup menu
-                        document.addEventListener('click', function (e) {
+                        document.addEventListener('click', function(e) {
                             const btn = e.target.closest('button');
                             const menu = document.getElementById('dropdownMenu');
                             if (!e.target.closest('.relative')) {
@@ -275,15 +271,10 @@ $admin_foto = $row && $row['foto']
                         });
                     </script>
 
-                    <!-- <a href="#tentangkami" class="tentangkami">Tentang Kami</a> -->
-                    <!-- <a href="#caraorder" class="nav-link">Cara Order</a> -->
-
                     <!-- pencarian -->
                     <div class="relative">
                         <input type="text" id="cari-list" placeholder="Cari produk..."
                             class="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#099ea3] focus:border-transparent">
-                        <!-- <i class="fas fa-search absolute right-3 top-2.5 text-gray-400"></i> -->
-
                         <!-- ikon pencarian bisa di klik -->
                         <button onclick="document.getElementById('cari-list').focus()"
                             class="absolute right-3 top-2.5 text-gray-300 hover:text-[#077c7f]">
@@ -297,8 +288,6 @@ $admin_foto = $row && $row['foto']
                             class="w-10 h-10 transition duration-200" style="margin-bottom: 7px;">
                             <img src="<?= htmlspecialchars($admin_foto) ?>" alt="Profil"
                                 class="w-10 h-10 object-cover rounded-full">
-
-
                         </button>
                         <!-- dropdown menu -->
                         <ul class="dropdown-menu shadow-lg rounded-lg overflow-hidden">
@@ -307,21 +296,19 @@ $admin_foto = $row && $row['foto']
                                     href="akun_admin.php">
                                     <img src="<?= htmlspecialchars($admin_foto) ?>" alt="Profil"
                                         class="w-10 h-10 object-contain rounded-full">
-
                                     <span>Akun Saya</span>
                                 </a>
                             </li>
                             <li class="hover:bg-gray-100 transition-colors duration-200">
                                 <a class="dropdown-item py-2 px-3 text-red-600 hover:text-red-800 hover:bg-red-50"
                                     href="logout.php">
-                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Keluar
                                 </a>
                             </li>
                         </ul>
                     </div>
-                </div> 
-            </div>    
-
+                </div>
+            </div>
         </nav>
 
         <!-- Main Content/konten utama -->
@@ -347,7 +334,7 @@ $admin_foto = $row && $row['foto']
             <br>
             <!--penjelasan produk -->
             <div class="text-center mb-5">
-                <h3 class="section-title">Our Collection</h3>
+                <h3 class="section-title">Koleksi Kami</h3>
                 <p class="text-muted w-75 mx-auto">
                     Toko Grosir Marhaban Perfume menjual berbagai aroma bibit parfum, botol parfum, perlengkapan racik
                     parfum, dll.
@@ -359,7 +346,6 @@ $admin_foto = $row && $row['foto']
             </div>
 
             <!-- tambah produk -->
-
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
                 <i class="fas fa-plus me-2"></i>Tambah Produk
             </button>
@@ -386,9 +372,14 @@ $admin_foto = $row && $row['foto']
             }
 
             while ($row = mysqli_fetch_assoc($result)) {
+                $product_id = $row['id'];
+                // Ambil varian termurah
+                $variant_result = mysqli_query($conn, "SELECT MIN(price) as min_price FROM product_variants WHERE product_id = $product_id");
+                $variant_data = mysqli_fetch_assoc($variant_result);
+                $price = $variant_data ? number_format($variant_data['min_price'], 0, ',', '.') : '-';
+
                 $name = htmlspecialchars($row["name"]);
                 $description = htmlspecialchars($row["description"]);
-                $price = number_format($row["price"], 0, ',', '.');
                 $image = !empty($row["image"]) ? "images/" . $row["image"] : "images/no-image.jpg";
 
                 echo "
@@ -414,7 +405,6 @@ $admin_foto = $row && $row['foto']
                                             data-id='{$row['id']}'
                                             data-name='" . htmlspecialchars($row['name']) . "'
                                             data-description='" . htmlspecialchars($row['description']) . "'
-                                            data-price='{$row['price']}'
                                             data-image='{$row['image']}'>
                                             <i class='fas fa-edit'></i>
                                         </button>
@@ -426,36 +416,10 @@ $admin_foto = $row && $row['foto']
                             </div>
                         </div>
                     </div>";
-
             }
             ?>
         </div>
         <br>
-
-        <!-- About us / tentang  kami -->
-        <!-- <section id="tentangkami" class="about-section py-8 px-6 lg:px-12">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex flex-col lg:flex-row items-center">
-                <div class="lg:w-1/2 mb-8 lg:mb-0 lg:pr-12">
-                    <h2 class="section-title text-3xl font-bold mb-4">Tentang Kami</h2>
-                    <p class="mb-4 leading-relaxed">
-                        Marhaban Perfume telah berkarya sejak tahun 2017 dan didirikan oleh Bapak Syarif Salim Bahanan.
-                        Kami menyediakan berbagai jenis parfum berkualitas dan melayani pengiriman ke seluruh Indonesia.
-                    </p>
-                    <p class="flex items-center">
-                        <i class="fas fa-map-marker-alt mr-2"></i>
-                        Jl. Empang No.31B, Empang, Kota Bogor, Jawa Barat 16132
-                    </p>
-                </div>
-                <div class="lg:w-1/2">
-                    <img src="images/about-us.png" alt="About Us"
-                        class="rounded-lg shadow-xl w-full max-h-72 object-contain">
-                </div>
-            </div>
-        </div>
-    </section> -->
-
-
 
         <!-- Footer -->
         <footer class="bg-gray-900 text-white py-8 px-6 lg:px-12">
@@ -476,7 +440,6 @@ $admin_foto = $row && $row['foto']
                                 <i class="fas fa-envelope mr-2 text-white-400"></i>
                                 <span>info@marhabanparfume.com</span>
                             </li>
-
                             <a href="https://www.google.com/maps/place/Marhaban+Parfum/@-6.606362,106.7926423,17z/data=!3m1!4b1!4m6!3m5!1s0x2e69c5d18c750557:0x8c2366fb253444ed!8m2!3d-6.606362!4d106.7952172!16s%2Fg%2F11mg9qzsd8?entry=ttu&g_ep=EgoyMDI1MDYxMS4wIKXMDSoASAFQAw%3D%3D"
                                 target="_blank" class="block">
                                 <li class="flex items-center hover:underline text-white">
@@ -484,7 +447,6 @@ $admin_foto = $row && $row['foto']
                                     <span>Jl. Empang No.31B, Bogor</span>
                                 </li>
                             </a>
-
                         </ul>
                     </div>
                     <div>
@@ -523,15 +485,14 @@ $admin_foto = $row && $row['foto']
                         <i class="fas fa-plus-circle me-2"></i>Tambah Produk Baru
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                        aria-label="Tutup"></button>
                 </div>
                 <div class="modal-body">
                     <form action="add_product.php" method="POST" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">Nama Produk</label>
-                                <input type="text" id="name" name="name" class="form-control" placeholder="Nama Produk"
-                                    required>
+                                <input type="text" id="name" name="name" class="form-control" placeholder="Nama Produk" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -551,25 +512,35 @@ $admin_foto = $row && $row['foto']
 
                         <div class="mb-3">
                             <label for="description" class="form-label">Deskripsi Produk</label>
-                            <textarea id="description" name="description" class="form-control" rows="3"
-                                placeholder="Deskripsi Produk"></textarea>
+                            <textarea id="description" name="description" class="form-control" rows="3" placeholder="Deskripsi Produk"></textarea>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="price" class="form-label">Harga</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="number" id="price" name="price" class="form-control"
-                                        placeholder="Harga" required>
-                                </div>
-                            </div>
-
                             <div class="col-md-6 mb-3">
                                 <label for="image" class="form-label">Gambar Produk</label>
                                 <input type="file" id="image" name="image" class="form-control" required>
                             </div>
                         </div>
+
+                        <hr>
+                        <h6 class="fw-bold mt-3 mb-2">Varian Ukuran & Harga</h6>
+                        <div id="variant-container">
+                            <div class="row g-2 mb-2 variant-row">
+                                <div class="col-md-4">
+                                    <input type="text" name="variant_size[]" class="form-control" placeholder="Ukuran (contoh: 30ml)" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" name="variant_price[]" class="form-control" placeholder="Harga" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" name="variant_stock[]" class="form-control" placeholder="Stok" required>
+                                </div>
+                                <div class="col-md-1 d-flex align-items-center">
+                                    <button type="button" class="btn btn-danger btn-sm remove-variant"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm mb-3" id="add-variant"><i class="fas fa-plus me-1"></i> Tambah Varian</button>
 
                         <div class="modal-footer border-top-0">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -595,34 +566,61 @@ $admin_foto = $row && $row['foto']
                         <i class="fas fa-edit me-2"></i>Edit Produk
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                        aria-label="Tutup"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="id" id="edit-id">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="edit-name" class="form-label">Nama Produk</label>
-                            <input type="text" name="name" id="edit-name" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="edit-price" class="form-label">Harga</label>
-                            <div class="input-group">
-                                <span class="input-group-text">Rp</span>
-                                <input type="number" name="price" id="edit-price" class="form-control" required>
-                            </div>
-                        </div>
+                    <div class="mb-3">
+                        <label for="edit-name" class="form-label">Nama Produk</label>
+                        <input type="text" name="name" id="edit-name" class="form-control" required>
                     </div>
+
                     <div class="mb-3">
                         <label for="edit-description" class="form-label">Deskripsi</label>
-                        <textarea name="description" id="edit-description" class="form-control" rows="3"
-                            required></textarea>
+                        <textarea name="description" id="edit-description" class="form-control" rows="3" required></textarea>
                     </div>
+
                     <div class="mb-3">
-                        <label for="edit-image" class="form-label">Gambar Baru (Opsional)</label>
+                        <label for="edit-category" class="form-label">Kategori</label>
+                        <select name="category_id" id="edit-category" class="form-select" required>
+                            <?php
+                            $catResult = mysqli_query($conn, "SELECT * FROM categories");
+                            while ($cat = mysqli_fetch_assoc($catResult)) {
+                                echo "<option value='{$cat['id']}'>{$cat['name']}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-image" class="form-label">Gambar Baru (opsional)</label>
                         <input type="file" name="image" id="edit-image" class="form-control">
                         <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
                     </div>
+
+                    <hr>
+                    <h6 class="fw-bold mb-2">Varian Ukuran & Harga</h6>
+                    <div id="existing-variants"></div>
+
+                    <div id="edit-variant-container">
+                        <div class="row g-2 mb-2 variant-row">
+                            <div class="col-md-4">
+                                <input type="text" name="new_variant_size[]" class="form-control" placeholder="Ukuran (contoh: 30ml)">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" name="new_variant_price[]" class="form-control" placeholder="Harga">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" name="new_variant_stock[]" class="form-control" placeholder="Stok">
+                            </div>
+                            <div class="col-md-1 d-flex align-items-center">
+                                <button type="button" class="btn btn-danger btn-sm remove-variant"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm mb-3" id="add-edit-variant"><i class="fas fa-plus me-1"></i> Tambah Varian Baru</button>
                 </div>
+
                 <div class="modal-footer border-top-0">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times me-1"></i> Batal
@@ -643,24 +641,18 @@ $admin_foto = $row && $row['foto']
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="productDetailModalLabel">Detail Produk</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                        aria-label="Tutup"></button>
                 </div>
                 <div class="modal-body row">
                     <div class="col-md-6">
-                        <img id="detailImage" src="" class="img-fluid rounded" alt="Product Image">
+                        <img id="detailImage" src="" class="img-fluid rounded" alt="Gambar Produk">
                     </div>
                     <div class="col-md-6">
                         <h3 id="detailTitle" class="mb-3"></h3>
                         <div id="detailDescription" class="mb-4 text-muted"></div>
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <span id="detailPrice" class="price-tag"></span>
-                            <!-- <a href="#" target="_blank" class="btn btn-primary">
-                                    <i class="fas fa-shopping-cart me-1"></i> Beli Sekarang
-                                </a> -->
                         </div>
-                        <!-- <a href="#" class="text-primary">
-                                <i class="fas fa-cart-plus me-1"></i> Tambahkan ke keranjang
-                            </a> -->
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -680,8 +672,8 @@ $admin_foto = $row && $row['foto']
 
     <script>
         // Product Detail Modal Handler
-        $(document).ready(function () {
-            $('.btnDetail').click(function () {
+        $(document).ready(function() {
+            $('.btnDetail').click(function() {
                 const card = $(this).closest('.card');
                 const title = card.find('.card-title').text();
                 const description = card.find('.deskripsi p').text();
@@ -697,9 +689,9 @@ $admin_foto = $row && $row['foto']
             });
 
             // Live Search / Pencarian Langsung
-            $('#cari-list').on('keyup', function () {
+            $('#cari-list').on('keyup', function() {
                 const keyword = $(this).val().toLowerCase();
-                $('.product-item').each(function () {
+                $('.product-item').each(function() {
                     const name = $(this).data('name').toLowerCase();
                     const description = $(this).data('description').toLowerCase();
 
@@ -712,7 +704,7 @@ $admin_foto = $row && $row['foto']
             });
 
             // Delete Product Confirmation
-            $('.btnDelete').click(function (e) {
+            $('.btnDelete').click(function(e) {
                 e.preventDefault();
 
                 if (!confirm("Yakin ingin menghapus produk ini?")) {
@@ -724,8 +716,10 @@ $admin_foto = $row && $row['foto']
                 $.ajax({
                     url: 'delete_product.php',
                     type: 'POST',
-                    data: { id: productId },
-                    success: function (response) {
+                    data: {
+                        id: productId
+                    },
+                    success: function(response) {
                         if (response.trim() === 'success') {
                             alert("Produk berhasil dihapus.");
                             location.reload();
@@ -733,42 +727,115 @@ $admin_foto = $row && $row['foto']
                             alert("Gagal menghapus: " + response);
                         }
                     },
-                    error: function () {
+                    error: function() {
                         alert("Terjadi kesalahan saat menghapus.");
                     }
                 });
             });
 
             // Edit Product Modal Handler
-            $('.btnEdit').click(function () {
+            $('.btnEdit').click(function() {
                 const id = $(this).data('id');
                 const name = $(this).data('name');
                 const description = $(this).data('description');
-                const price = $(this).data('price');
-
+                const category = $(this).data('category');
                 $('#edit-id').val(id);
                 $('#edit-name').val(name);
                 $('#edit-description').val(description);
-                $('#edit-price').val(price);
+                $('#edit-category').val(category);
+
+                // Muat varian via Ajax
+                $.getJSON('get_variants.php', {
+                    product_id: id
+                }, function(variants) {
+                    const container = $('#existing-variants');
+                    container.empty();
+                    variants.forEach(v => {
+                        container.append(`
+                            <div class="row g-2 mb-2 align-items-center existing-variant-row">
+                                <input type="hidden" name="existing_variant_id[]" value="${v.id}">
+                                <div class="col-md-4">
+                                    <input type="text" name="existing_variant_size[]" class="form-control" value="${v.size}" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" name="existing_variant_price[]" class="form-control" value="${v.price}" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" name="existing_variant_stock[]" class="form-control" value="${v.stock}" required>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <input type="checkbox" name="delete_variants[]" value="${v.id}"> Hapus
+                                </div>
+                            </div>`);
+                    });
+                });
+            });
+
+            // Tambah varian baru di modal edit
+            $('#add-edit-variant').click(function() {
+                const newRow = `
+                    <div class="row g-2 mb-2 variant-row">
+                        <div class="col-md-4">
+                            <input type="text" name="new_variant_size[]" class="form-control" placeholder="Ukuran">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" name="new_variant_price[]" class="form-control" placeholder="Harga">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="number" name="new_variant_stock[]" class="form-control" placeholder="Stok">
+                        </div>
+                        <div class="col-md-1 d-flex align-items-center">
+                            <button type="button" class="btn btn-danger btn-sm remove-variant"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>`;
+                $('#edit-variant-container').append(newRow);
+            });
+
+            // Hapus baris varian baru (belum disimpan)
+            $('#edit-variant-container').on('click', '.remove-variant', function() {
+                $(this).closest('.variant-row').remove();
+            });
+
+            //ketika tombol pencarian di klik/di cari produknya, langsung ngeredirect ke produk yang di cari
+            function scrollToTombol() {
+                document.getElementById('kumpulan_katalog').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+
+            function focusAndScroll() {
+                const input = document.getElementById('cari-list');
+                input.focus();
+                scrollToTombol();
+            }
+            //trigger scroll juga saat user mulai ngetik
+            document.getElementById('cari-list').addEventListener('input', scrollToTombol);
+
+            // Tambah varian di modal tambah produk
+            $('#add-variant').click(function() {
+                const newRow = `
+                    <div class="row g-2 mb-2 variant-row">
+                        <div class="col-md-4">
+                            <input type="text" name="variant_size[]" class="form-control" placeholder="Ukuran (contoh: 30ml)" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" name="variant_price[]" class="form-control" placeholder="Harga" required>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="number" name="variant_stock[]" class="form-control" placeholder="Stok" required>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-center">
+                            <button type="button" class="btn btn-danger btn-sm remove-variant"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>`;
+                $('#variant-container').append(newRow);
+            });
+
+            // Hapus varian di modal tambah produk
+            $('#variant-container').on('click', '.remove-variant', function() {
+                $(this).closest('.variant-row').remove();
             });
         });
-    </script>
-
-    <script>
-
-        //ketika tombol pencarian di klik/di cari produknya, langsung ngeredirect ke produk yang di cari
-        function scrollToTombol() {
-            document.getElementById('kumpulan_katalog').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function focusAndScroll() {
-            const input = document.getElementById('cari-list');
-            input.focus();
-            scrollToTombol();
-        }
-        //trigger scroll juga saat user mulai ngetik
-        document.getElementById('cari-list').addEventListener('input', scrollToTombol);
-
     </script>
 </body>
 

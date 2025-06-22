@@ -1,5 +1,6 @@
 <?php
 session_start();
+include 'db.php';
 
 // Hitung total belanja
 $total = 0;
@@ -24,8 +25,9 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
     $whatsappMessage = "Keranjang Anda kosong.";
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
@@ -105,6 +107,13 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                             <?php foreach ($_SESSION['cart'] as $index => $item):
                                 $image = !empty($item['image']) ? $item['image'] : "images/no-image.jpg";
                                 $itemTotal = $item['price'] * $item['quantity'];
+
+                                // Ambil varian produk
+                                $variants = [];
+                                $variant_query = mysqli_query($conn, "SELECT * FROM product_variants WHERE product_id = {$item['id']}");
+                                while ($v = mysqli_fetch_assoc($variant_query)) {
+                                    $variants[] = $v;
+                                }
                             ?>
                                 <div class="cart-item bg-white border border-gray-200 rounded-lg p-4 transition duration-300">
                                     <div class="flex flex-col md:flex-row gap-4">
@@ -118,17 +127,30 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                                         <div class="flex-grow">
                                             <div class="flex justify-between">
                                                 <div>
-                                                    <h3 class="font-semibold text-gray-800"><?= htmlspecialchars($item['name']) ?></h3>
-                                                    <?php if (!empty($item['size'])): ?>
-                                                        <p class="text-sm text-gray-500 mt-1">Ukuran: <?= htmlspecialchars($item['size']) ?></p>
+                                                    <h3 class="font-semibold text-gray-800 mb-1"><?= htmlspecialchars($item['name']) ?></h3>
+
+                                                    <?php if (!empty($variants)): ?>
+                                                        <form method="post" action="update_variant_cart.php" class="mt-1 inline-block">
+                                                            <select name="variant_id" class="text-sm text-gray-700 border rounded px-2 py-1" onchange="this.form.submit()">
+                                                                <?php foreach ($variants as $v): ?>
+                                                                    <option value="<?= $v['id'] ?>"
+                                                                        <?= $v['id'] == ($item['variant_id'] ?? 0) ? 'selected' : '' ?>>
+                                                                        <?= $v['size'] ?> - Rp <?= number_format($v['price'], 0, ',', '.') ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                            <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
+                                                            <input type="hidden" name="current_variant_id" value="<?= $item['variant_id'] ?? 0 ?>">
+                                                        </form>
                                                     <?php endif; ?>
+
                                                     <p class="text-blue-600 font-semibold mt-2">
                                                         Rp <?= number_format($item['price'], 0, ',', '.') ?>
                                                     </p>
                                                 </div>
                                                 <button class="remove-item text-red-500 hover:text-red-700 h-8"
                                                     data-id="<?= $item['id'] ?>"
-                                                    data-size="<?= htmlspecialchars($item['size'] ?? '') ?>">
+                                                    data-variant-id="<?= $item['variant_id'] ?? 0 ?>">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </div>
@@ -138,7 +160,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                                                 <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
                                                     <button class="quantity-btn minus bg-gray-100 px-3 py-1 hover:bg-gray-200"
                                                         data-id="<?= $item['id'] ?>"
-                                                        data-size="<?= htmlspecialchars($item['size'] ?? '') ?>">
+                                                        data-variant-id="<?= $item['variant_id'] ?? 0 ?>">
                                                         <i class="fas fa-minus text-sm"></i>
                                                     </button>
                                                     <span class="quantity bg-white px-4 py-1 text-center w-12">
@@ -146,7 +168,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                                                     </span>
                                                     <button class="quantity-btn plus bg-gray-100 px-3 py-1 hover:bg-gray-200"
                                                         data-id="<?= $item['id'] ?>"
-                                                        data-size="<?= htmlspecialchars($item['size'] ?? '') ?>">
+                                                        data-variant-id="<?= $item['variant_id'] ?? 0 ?>">
                                                         <i class="fas fa-plus text-sm"></i>
                                                     </button>
                                                 </div>
@@ -209,7 +231,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
             document.querySelectorAll('.quantity-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const productId = this.getAttribute('data-id');
-                    const productSize = this.getAttribute('data-size');
+                    const variantId = this.getAttribute('data-variant-id');
                     const isMinus = this.classList.contains('minus');
 
                     fetch('update_cart.php', {
@@ -217,7 +239,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
                             },
-                            body: `id=${productId}&size=${encodeURIComponent(productSize)}&action=${isMinus ? 'decrease' : 'increase'}`
+                            body: `id=${productId}&variant_id=${variantId}&action=${isMinus ? 'decrease' : 'increase'}`
                         })
                         .then(response => response.json())
                         .then(data => {
@@ -232,7 +254,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
             document.querySelectorAll('.remove-item').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const productId = this.getAttribute('data-id');
-                    const productSize = this.getAttribute('data-size');
+                    const variantId = this.getAttribute('data-variant-id');
 
                     Swal.fire({
                         title: 'Hapus Produk?',
@@ -250,7 +272,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                                     headers: {
                                         'Content-Type': 'application/x-www-form-urlencoded',
                                     },
-                                    body: `id=${productId}&size=${encodeURIComponent(productSize)}`
+                                    body: `id=${productId}&variant_id=${variantId}`
                                 })
                                 .then(response => response.json())
                                 .then(data => {
